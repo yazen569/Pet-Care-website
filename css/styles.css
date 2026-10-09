@@ -166,7 +166,7 @@ a { color: inherit; }
 .section-sub { color: var(--muted); margin: 0 auto 40px; max-width: 40em; }
 .price-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   text-align: left;
   align-items: start;
@@ -177,6 +177,7 @@ a { color: inherit; }
   padding: 28px;
   box-shadow: var(--shadow);
   border: 2px solid transparent;
+  position: relative;
 }
 .price-card.featured { border-color: var(--teal); }
 .price-card header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
@@ -192,7 +193,81 @@ a { color: inherit; }
 }
 .price-list li:last-child { border-bottom: 0; }
 .price { font-weight: 700; color: var(--ink); white-space: nowrap; }
-.fine-print { color: var(--muted); font-size: 0.85rem; margin-top: 28px; }
+.price-list li.price-group {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--coral);
+  padding: 12px 0 4px;
+  border-bottom: 0;
+}
+.badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* What is / isn't included */
+.coverage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.coverage-block {
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+}
+.coverage-block h4 { font-size: 0.9rem; margin-bottom: 8px; }
+.coverage-block ul { list-style: none; margin: 0; padding: 0; }
+.coverage-block li {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+.coverage-block li::before {
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+}
+.included { background: #e8f4f2; }
+.included h4 { color: var(--teal-dark); }
+.included li::before { content: "✓"; color: var(--teal); }
+.excluded { background: #fdeeea; }
+.excluded h4 { color: #b4472b; }
+.excluded li::before { content: "✕"; color: var(--coral); }
+.card-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: var(--cream);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 0 0 20px;
+}
+
+.good-to-know {
+  margin-top: 40px;
+  background: var(--white);
+  border-left: 4px solid var(--teal);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px 28px;
+  text-align: left;
+}
+.good-to-know h3 { color: var(--teal-dark); }
+.good-to-know ul { margin: 0; padding-left: 20px; color: var(--muted); }
+.good-to-know li { margin-bottom: 8px; }
+.good-to-know strong { color: var(--ink); }
 
 /* CTA */
 .cta { background: var(--teal); color: var(--white); padding: 56px 0; }
@@ -255,6 +330,7 @@ a { color: inherit; }
   .bubble-cat { width: 120px; height: 120px; font-size: 60px; }
   .values { grid-template-columns: repeat(2, 1fr); }
   .price-grid { grid-template-columns: 1fr; }
+  .coverage { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 
