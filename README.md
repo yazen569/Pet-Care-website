@@ -21,14 +21,14 @@ Or serve it locally with `python3 -m http.server 8000` and visit http://localhos
 
 - **Mission:** an inclusive, fear-free environment for every dog and cat, whatever its breed, size, age or needs
 - **Services & pricing:** dog grooming, cat grooming and add-ons
-- **Placeholder links:** nav, booking buttons, login and footer links are intentionally non-functional for the MVP. Clicking one shows a "coming soon" message.
+- **Placeholder links:** every link and button is intentionally non-functional for the MVP. Clicking one does nothing.
 
 ## Structure
 
 ```
 index.html      Homepage
 css/styles.css  Styles (responsive, no frameworks)
-js/main.js      "Coming soon" handler for placeholder links (data-mvp)
+js/main.js      Stops placeholder links (data-mvp) from doing anything
 ```
 
 Prices are placeholders. Edit them in the `Services & pricing` section of `index.html`.
