@@ -49,6 +49,14 @@ a { color: inherit; }
 .btn-block { display: block; text-align: center; }
 .btn-ghost { background: var(--white); color: var(--teal-dark); border-color: var(--teal); }
 
+/* Header */
+.site-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+}
+.company-name { font-size: 1.4rem; font-weight: 700; color: var(--teal-dark); }
+
 /* Hero */
 .hero {
   background: var(--sand);
