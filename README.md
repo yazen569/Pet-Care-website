@@ -18,7 +18,7 @@ You can still open `index.html` directly in a browser to look at the page, but b
 
 - **Booking:** "Book an appointment" and the "Book ..." buttons on each service card take you to the booking form (the card buttons pre-select the matching service). Taken time slots show as "(booked)", Sundays are closed, and each booking gets a reference number like `PC-1A2B3C`.
 - **Reviews:** "Write a review" opens a form. Submitted reviews show on the page, newest first.
-- **Contact us** section at the bottom (placeholder address, phone and email).
+- **Contact us** section at the bottom with address, phone, email and hours.
 - **Logo:** `images/logo.svg`, also used as the browser tab icon.
 
 ## Where the data is saved
