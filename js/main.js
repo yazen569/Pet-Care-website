@@ -181,7 +181,7 @@ async function loadReviews() {
       reviewList.innerHTML = '<p class="muted">No reviews yet. Be the first to share your experience.</p>';
     }
   } catch (error) {
-    reviewList.innerHTML = '<p class="muted">Reviews will show here when the site server is running.</p>';
+    reviewList.replaceChildren();
   }
 }
 
