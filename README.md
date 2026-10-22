@@ -1,34 +1,43 @@
 # Pawsitive Care: MVP Website
 
-MVP homepage for **Pawsitive Care**, an inclusive grooming business for dogs and cats.
+MVP website for **Pawsitive Care**, a welcoming grooming and vaccination business for dogs and cats, with a focus on new pet owners.
 
-## View it locally
+## Run it locally
 
-No build step or server is needed. Open `index.html` in any browser:
+You need Python 3 (nothing else to install). From this folder:
 
 ```bash
-# macOS
-open index.html
-# Linux
-xdg-open index.html
-# Windows
-start index.html
+python3 server.py
 ```
 
-Or serve it locally with `python3 -m http.server 8000` and visit http://localhost:8000.
+Then open http://localhost:8000. Press `Ctrl+C` to stop. To use another port: `python3 server.py 9000`.
 
-## What's included
+You can still open `index.html` directly in a browser to look at the page, but booking and reviews only work when the server is running.
 
-- **Mission:** an inclusive, fear-free environment for every dog and cat, whatever its breed, size, age or needs
-- **Services & pricing:** dog grooming, cat grooming and add-ons
-- **Placeholder links:** every link and button is intentionally non-functional for the MVP. Clicking one does nothing.
+## Features
+
+- **Booking:** "Book an appointment" and the "Book ..." buttons on each service card take you to the booking form (the card buttons pre-select the matching service). Taken time slots show as "(booked)", Sundays are closed, and each booking gets a reference number like `PC-1A2B3C`.
+- **Reviews:** "Write a review" opens a form. Submitted reviews show on the page, newest first.
+- **Contact us** section at the bottom (placeholder address, phone and email).
+- **Logo:** `images/logo.svg`, also used as the browser tab icon.
+
+## Where the data is saved
+
+| File | What's in it |
+|---|---|
+| `data/appointments.txt` | One booking per line |
+| `data/reviews.txt` | One review per line |
+
+Fields are separated by ` | ` and the first line of each file lists the field names. The server never sends these files to the browser, so visitors can't read other people's bookings.
 
 ## Structure
 
 ```
-index.html      Homepage
-css/styles.css  Styles (responsive, no frameworks)
-js/main.js      Stops placeholder links (data-mvp) from doing anything
+index.html            The page (text, prices, forms)
+css/styles.css        Styles
+js/main.js            Booking and review form logic
+images/logo.svg       Logo
+server.py             Local server; saves bookings and reviews
+data/                 appointments.txt and reviews.txt
+tests/test_server.py  Tests: python3 -m unittest discover -s tests
 ```
-
-Prices are placeholders. Edit them in the `Services & pricing` section of `index.html`.

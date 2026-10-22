@@ -46,6 +46,8 @@ a { color: inherit; }
   border-radius: 4px;
   border: 1px solid var(--coral);
 }
+.btn { font: inherit; font-weight: 600; cursor: pointer; }
+.btn:disabled { opacity: 0.6; cursor: default; }
 .btn-block { display: block; text-align: center; }
 .btn-ghost { background: var(--white); color: var(--teal-dark); border-color: var(--teal); }
 
@@ -55,6 +57,8 @@ a { color: inherit; }
   border-bottom: 1px solid var(--line);
   padding: 14px 0;
 }
+.header-inner { display: flex; align-items: center; gap: 12px; }
+.logo { display: block; width: 44px; height: 44px; }
 .company-name { font-size: 1.4rem; font-weight: 700; color: var(--teal-dark); }
 
 /* Hero */
@@ -72,7 +76,7 @@ a { color: inherit; }
 .mission h2 { font-size: 1.8rem; }
 .mission-statement {
   max-width: 760px;
-  margin: 0;
+  margin: 0 0 12px;
   color: var(--muted);
 }
 
@@ -127,12 +131,90 @@ a { color: inherit; }
 .included h4 { color: var(--teal-dark); }
 .excluded h4 { color: #b4472b; }
 
+/* Forms */
+.booking, .reviews { padding: 48px 0; border-top: 1px solid var(--line); }
+.booking { background: var(--white); }
+.booking h2, .reviews h2, .contact h2 { font-size: 1.8rem; }
+.form-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 20px;
+  max-width: 760px;
+  margin-top: 16px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+  margin-bottom: 16px;
+}
+.form-grid label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 0.9rem; }
+.form-grid .full { grid-column: 1 / -1; }
+.form-grid .checkbox { flex-direction: row; align-items: center; gap: 8px; font-weight: 400; }
+.optional { font-weight: 400; color: var(--muted); }
+input, select, textarea {
+  font: inherit;
+  font-weight: 400;
+  padding: 8px 10px;
+  border: 1px solid #c9bfb1;
+  border-radius: 4px;
+  background: var(--white);
+  color: var(--ink);
+  width: 100%;
+  min-width: 0;
+}
+.checkbox input { width: auto; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+.form-status { margin: 12px 0 0; min-height: 1.5em; color: var(--teal-dark); }
+.form-status.error { color: #b4472b; }
+.confirmation {
+  max-width: 760px;
+  border: 1px solid var(--teal);
+  border-left-width: 4px;
+  border-radius: 4px;
+  background: #eef6f5;
+  padding: 20px;
+  margin-top: 16px;
+}
+.confirmation h3 { color: var(--teal-dark); }
+
+/* Reviews */
+.review-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+.review {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px;
+}
+.review p { margin: 0 0 8px; }
+.review-rating { font-weight: 700; color: var(--coral); }
+.review-author { color: var(--muted); font-size: 0.9rem; }
+.muted { color: var(--muted); }
+
+/* Contact */
+.contact { padding: 48px 0; background: var(--sand); border-top: 1px solid var(--line); }
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.contact h3 { font-size: 1rem; color: var(--teal-dark); }
+.contact-grid p { margin: 0; color: var(--muted); overflow-wrap: anywhere; }
+
 /* Responsive */
 @media (max-width: 900px) {
   .price-grid { grid-template-columns: 1fr; }
   .coverage { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 560px) {
   .hero h1 { font-size: 2rem; }
+  .form-grid, .review-list, .contact-grid { grid-template-columns: minmax(0, 1fr); }
 }
