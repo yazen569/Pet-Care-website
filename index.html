@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pawsitive Care | Grooming &amp; Vaccinations for Every Dog &amp; Cat</title>
-  <meta name="description" content="Pawsitive Care offers gentle, inclusive grooming and vaccinations for dogs and cats of every breed, size, age and temperament.">
+  <meta name="description" content="Pawsitive Care offers gentle, welcoming grooming and vaccinations for dogs and cats, with extra support for new pet owners.">
   <link rel="icon" href="images/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -12,13 +12,23 @@
 
   <header class="site-header">
     <div class="container header-inner">
-      <img src="images/logo.svg" alt="" class="logo" width="44" height="44">
-      <span class="company-name">Pawsitive Care</span>
+      <a href="index.html" class="brand">
+        <img src="images/logo.svg" alt="" class="logo" width="44" height="44">
+        <span class="company-name">Pawsitive Care</span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="assistant.html">AI Assistant</a>
+        <a href="book.html">Book</a>
+        <a href="reviews.html">Reviews</a>
+        <a href="contact.html">Contact</a>
+      </nav>
     </div>
   </header>
 
   <main>
-    <!-- Hero -->
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-text">
@@ -26,333 +36,37 @@
           <h1>Every pet is welcome here.</h1>
           <p class="lead">Gentle, judgment-free grooming and vaccinations for dogs and cats of every breed, size, age, coat and personality.</p>
           <div class="hero-actions">
-            <a href="#booking" class="btn">Book an appointment</a>
-            <a href="#services" class="btn btn-ghost">See prices</a>
+            <a href="book.html" class="btn">Book an appointment</a>
+            <a href="services.html" class="btn btn-ghost">See prices</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Mission -->
-    <section class="mission" id="mission">
-      <div class="container">
-        <p class="eyebrow">Our mission</p>
-        <h2>New pet owners are always welcome</h2>
-        <p class="mission-statement">
-          Our mission at Pawsitive Care is to make professional pet care easy and welcoming for everyone,
-          especially new pet owners. Whether you just brought home your first puppy, adopted a cat, or are
-          still learning what your pet needs, we're here to help. No question is too basic. We explain every
-          step, show you what we're doing and why, and share simple tips you can use at home.
-        </p>
-        <p class="mission-statement">
-          Every dog and cat is welcome, whatever their breed, size, age or temperament. We go at your pet's
-          pace, and yours.
-        </p>
-      </div>
-    </section>
-
-    <!-- Services & pricing -->
-    <section class="services" id="services">
-      <div class="container">
-        <p class="eyebrow">Services &amp; pricing</p>
-        <h2>Simple, transparent prices</h2>
-        <p class="section-sub">Every service starts with a free meet-and-greet so we can learn what your pet needs. Each card below lists exactly what is and isn't included, so there are no surprises.</p>
-
-        <div class="price-grid">
-          <article class="price-card">
-            <header>
-              <h3>Dog grooming</h3>
-            </header>
-            <ul class="price-list">
-              <li><span>Bath &amp; brush (small, under 25 lb)</span><span class="price">$45</span></li>
-              <li><span>Bath &amp; brush (medium, 25–60 lb)</span><span class="price">$60</span></li>
-              <li><span>Bath &amp; brush (large, 60 lb+)</span><span class="price">$75</span></li>
-              <li><span>Full groom (bath, haircut, nails, ears)</span><span class="price">from $70</span></li>
-              <li><span>Puppy's first groom (under 6 months)</span><span class="price">$35</span></li>
-            </ul>
-            <div class="coverage">
-              <div class="coverage-block included">
-                <h4>What's included</h4>
-                <ul>
-                  <li>Gentle shampoo &amp; conditioner for your dog's coat type</li>
-                  <li>Hand or low-heat blow-dry and full brush-out</li>
-                  <li>Ear check and paw-pad tidy</li>
-                  <li>Full groom adds a breed or custom haircut, nail trim and ear cleaning</li>
-                  <li>Puppy groom: short bath, face and paw tidy, and a nail trim</li>
-                </ul>
-              </div>
-              <div class="coverage-block excluded">
-                <h4>Not included</h4>
-                <ul>
-                  <li>Nail trims and ear cleaning with a bath &amp; brush (add-ons)</li>
-                  <li>De-matting over 15 minutes (charged per 15 min)</li>
-                  <li>Flea &amp; tick or medicated baths</li>
-                  <li>Sedation of any kind</li>
-                </ul>
-              </div>
-            </div>
-            <a href="#booking" class="btn btn-block" data-book="Dog grooming">Book dog grooming</a>
-          </article>
-
-          <article class="price-card">
-            <header>
-              <h3>Cat grooming</h3>
-            </header>
-            <ul class="price-list">
-              <li><span>Bath &amp; brush</span><span class="price">$55</span></li>
-              <li><span>Lion cut</span><span class="price">$75</span></li>
-              <li><span>De-shedding treatment</span><span class="price">$65</span></li>
-              <li><span>Sanitary trim</span><span class="price">$30</span></li>
-              <li><span>Calm-cat session (extra time &amp; breaks)</span><span class="price">+$15</span></li>
-            </ul>
-            <div class="coverage">
-              <div class="coverage-block included">
-                <h4>What's included</h4>
-                <ul>
-                  <li>Appointment during cat-only hours in a dog-free room</li>
-                  <li>Cat-safe shampoo, towel and low-noise dry, full brush-out</li>
-                  <li>Nail trim with every bath, lion cut and de-shedding service</li>
-                  <li>Lion cut includes a full body clip with mane, boots and tail tip left on</li>
-                </ul>
-              </div>
-              <div class="coverage-block excluded">
-                <h4>Not included</h4>
-                <ul>
-                  <li>Ear cleaning and teeth brushing (add-ons)</li>
-                  <li>De-matting over 15 minutes (charged per 15 min)</li>
-                  <li>Nail caps</li>
-                  <li>Sedation of any kind</li>
-                </ul>
-              </div>
-            </div>
-            <a href="#booking" class="btn btn-block" data-book="Cat grooming">Book cat grooming</a>
-          </article>
-
-          <article class="price-card">
-            <header>
-              <h3>Vaccinations</h3>
-            </header>
-            <ul class="price-list">
-              <li class="price-group">Dogs</li>
-              <li><span>Rabies</span><span class="price">$25</span></li>
-              <li><span>DHPP (distemper combo)</span><span class="price">$35</span></li>
-              <li><span>Bordetella (kennel cough)</span><span class="price">$30</span></li>
-              <li><span>Leptospirosis</span><span class="price">$30</span></li>
-              <li class="price-group">Cats</li>
-              <li><span>Rabies</span><span class="price">$25</span></li>
-              <li><span>FVRCP (feline distemper combo)</span><span class="price">$30</span></li>
-              <li><span>FeLV (feline leukemia)</span><span class="price">$35</span></li>
-            </ul>
-            <div class="coverage">
-              <div class="coverage-block included">
-                <h4>What's included</h4>
-                <ul>
-                  <li>Given by a licensed veterinarian during our vaccine clinic hours</li>
-                  <li>Quick health check before each shot (weight, temperature, heart)</li>
-                  <li>Signed vaccination certificate and rabies tag</li>
-                  <li>Email or text reminder when the next dose or booster is due</li>
-                  <li>Can be done on the same visit as a groom</li>
-                </ul>
-              </div>
-              <div class="coverage-block excluded">
-                <h4>Not included</h4>
-                <ul>
-                  <li>Full wellness exams, diagnosis or treatment of illness or injury</li>
-                  <li>Lab tests (heartworm, FIV/FeLV testing, fecal tests)</li>
-                  <li>Prescriptions, flea/tick/heartworm medication and microchipping</li>
-                  <li>Emergency care (please contact your vet or an emergency clinic)</li>
-                </ul>
-              </div>
-            </div>
-            <a href="#booking" class="btn btn-block" data-book="Vaccinations">Book a vaccination</a>
-          </article>
-
-          <article class="price-card">
-            <header>
-              <h3>Add-ons</h3>
-            </header>
-            <ul class="price-list">
-              <li><span>Nail trim (walk-in)</span><span class="price">$15</span></li>
-              <li><span>Nail grinding</span><span class="price">$20</span></li>
-              <li><span>Ear cleaning</span><span class="price">$12</span></li>
-              <li><span>Teeth brushing</span><span class="price">$12</span></li>
-              <li><span>De-matting (per 15 min)</span><span class="price">$15</span></li>
-              <li><span>Flea &amp; tick bath</span><span class="price">$20</span></li>
-            </ul>
-            <div class="coverage">
-              <div class="coverage-block included">
-                <h4>What's included</h4>
-                <ul>
-                  <li>Can be added to any groom, or booked on its own</li>
-                  <li>Nail trims are walk-in friendly, no appointment needed</li>
-                  <li>Teeth brushing uses pet-safe enzymatic toothpaste</li>
-                </ul>
-              </div>
-              <div class="coverage-block excluded">
-                <h4>Not included</h4>
-                <ul>
-                  <li>Dental cleaning or scaling (this needs a vet)</li>
-                  <li>Treatment of ear infections or skin conditions</li>
-                  <li>Ongoing flea prevention (the bath treats current fleas only)</li>
-                </ul>
-              </div>
-            </div>
-            <a href="#booking" class="btn btn-block btn-ghost" data-book="Add-ons">Book an add-on</a>
-          </article>
+    <!-- Assistant teaser -->
+    <section class="teaser">
+      <div class="container teaser-inner">
+        <div>
+          <p class="eyebrow">New: AI care assistant</p>
+          <h2>Not sure what your pet needs?</h2>
+          <p class="muted">Describe your pet in your own words and our AI assistant will recommend services and estimate the total price in seconds.</p>
         </div>
+        <a href="assistant.html" class="btn">Try the AI assistant</a>
       </div>
     </section>
-    <!-- Booking -->
-    <section class="booking" id="booking">
-      <div class="container">
-        <p class="eyebrow">Book an appointment</p>
-        <h2>Pick a time that works for you</h2>
-        <p class="section-sub">Open Monday to Saturday, 9:00 AM to 5:00 PM. New to all this? Choose the free meet-and-greet and we'll take it from there.</p>
 
-        <form id="booking-form" class="form-card">
-          <div class="form-grid">
-            <label>Your name
-              <input type="text" name="owner_name" maxlength="80" required autocomplete="name">
-            </label>
-            <label>Email
-              <input type="email" name="email" maxlength="120" required autocomplete="email">
-            </label>
-            <label><span>Phone <span class="optional">(optional)</span></span>
-              <input type="tel" name="phone" maxlength="30" autocomplete="tel">
-            </label>
-            <label>Pet's name
-              <input type="text" name="pet_name" maxlength="60" required>
-            </label>
-            <label>Pet type
-              <select name="pet_type" required>
-                <option value="">Choose one</option>
-                <option>Dog</option>
-                <option>Cat</option>
-              </select>
-            </label>
-            <label>Service
-              <select name="service" required>
-                <option value="">Choose a service</option>
-                <optgroup label="Getting started">
-                  <option>Free meet-and-greet</option>
-                </optgroup>
-                <optgroup label="Dog grooming">
-                  <option>Dog: Bath &amp; brush (small, under 25 lb)</option>
-                  <option>Dog: Bath &amp; brush (medium, 25–60 lb)</option>
-                  <option>Dog: Bath &amp; brush (large, 60 lb+)</option>
-                  <option>Dog: Full groom</option>
-                  <option>Dog: Puppy's first groom</option>
-                </optgroup>
-                <optgroup label="Cat grooming">
-                  <option>Cat: Bath &amp; brush</option>
-                  <option>Cat: Lion cut</option>
-                  <option>Cat: De-shedding treatment</option>
-                  <option>Cat: Sanitary trim</option>
-                </optgroup>
-                <optgroup label="Vaccinations">
-                  <option>Dog: Vaccination</option>
-                  <option>Cat: Vaccination</option>
-                </optgroup>
-                <optgroup label="Add-ons">
-                  <option>Add-on only (nail trim, ears, teeth, de-matting or flea bath)</option>
-                </optgroup>
-              </select>
-            </label>
-            <label>Date
-              <input type="date" name="date" required>
-            </label>
-            <label>Time
-              <select name="time" required disabled>
-                <option value="">Pick a date first</option>
-              </select>
-            </label>
-            <label class="full"><span>Anything we should know? <span class="optional">(optional)</span></span>
-              <textarea name="notes" rows="3" maxlength="500" placeholder="Health issues, nervousness, special requests..."></textarea>
-            </label>
-            <label class="full checkbox">
-              <input type="checkbox" name="first_time_owner">
-              This is my first pet, and I'd like some extra guidance
-            </label>
-          </div>
-          <button type="submit" class="btn">Book appointment</button>
-          <p class="form-status" id="booking-status" role="status"></p>
-        </form>
-
-        <div class="confirmation" id="booking-confirmation" hidden>
-          <h3>You're booked!</h3>
-          <p id="booking-summary"></p>
-          <p>Your reference number is <strong id="booking-reference"></strong>. Please keep it handy in case you need to change your appointment.</p>
-          <button type="button" class="btn btn-ghost" id="book-another">Book another appointment</button>
+    <!-- New owners -->
+    <section class="teaser teaser-alt">
+      <div class="container teaser-inner">
+        <div>
+          <p class="eyebrow">First-time pet owner?</p>
+          <h2>You're in the right place</h2>
+          <p class="muted">No question is too basic. Start with a free meet-and-greet and we'll walk you through everything.</p>
         </div>
-      </div>
-    </section>
-
-    <!-- Reviews -->
-    <section class="reviews" id="reviews">
-      <div class="container">
-        <p class="eyebrow">Reviews</p>
-        <h2>What pet owners say</h2>
-        <button type="button" class="btn" id="write-review">Write a review</button>
-
-        <form id="review-form" class="form-card" hidden>
-          <div class="form-grid">
-            <label>Your name
-              <input type="text" name="name" maxlength="60" required autocomplete="name">
-            </label>
-            <label><span>Pet's name <span class="optional">(optional)</span></span>
-              <input type="text" name="pet_name" maxlength="60">
-            </label>
-            <label>Rating
-              <select name="rating" required>
-                <option value="">Choose a rating</option>
-                <option value="5">5 - Excellent</option>
-                <option value="4">4 - Good</option>
-                <option value="3">3 - Okay</option>
-                <option value="2">2 - Poor</option>
-                <option value="1">1 - Bad</option>
-              </select>
-            </label>
-            <label class="full">Your review
-              <textarea name="review" rows="4" minlength="5" maxlength="1000" required></textarea>
-            </label>
-          </div>
-          <button type="submit" class="btn">Submit review</button>
-          <p class="form-status" id="review-status" role="status"></p>
-        </form>
-        <p class="form-status" id="review-thanks" role="status"></p>
-
-        <div class="review-list" id="review-list"></div>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section class="contact" id="contact">
-      <div class="container">
-        <p class="eyebrow">Contact us</p>
-        <h2>Get in touch</h2>
-        <p class="section-sub">Questions about your pet, our services or your first visit? We're happy to help.</p>
-        <div class="contact-grid">
-          <div>
-            <h3>Visit</h3>
-            <p>Washington University in St. Louis<br>1 Brookings Drive<br>St. Louis, MO 63130</p>
-          </div>
-          <div>
-            <h3>Call</h3>
-            <p>(314) 010-0123</p>
-          </div>
-          <div>
-            <h3>Email</h3>
-            <p>pawsitivecare@gmail.com</p>
-          </div>
-          <div>
-            <h3>Hours</h3>
-            <p>Monday to Saturday: 9:00 AM to 5:00 PM<br>Sunday: Closed</p>
-          </div>
-        </div>
+        <a href="about.html" class="btn btn-ghost">Read our mission</a>
       </div>
     </section>
   </main>
 
-  <script src="js/main.js"></script>
 </body>
 </html>

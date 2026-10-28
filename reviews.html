@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviews | Pawsitive Care</title>
+  <meta name="description" content="Pawsitive Care offers gentle, welcoming grooming and vaccinations for dogs and cats, with extra support for new pet owners.">
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <img src="images/logo.svg" alt="" class="logo" width="44" height="44">
+        <span class="company-name">Pawsitive Care</span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="assistant.html">AI Assistant</a>
+        <a href="book.html">Book</a>
+        <a href="reviews.html" aria-current="page">Reviews</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="reviews" id="reviews">
+      <div class="container">
+        <p class="eyebrow">Reviews</p>
+        <h1>What pet owners say</h1>
+        <button type="button" class="btn" id="write-review">Write a review</button>
+
+        <form id="review-form" class="form-card" hidden>
+          <div class="form-grid">
+            <label>Your name
+              <input type="text" name="name" maxlength="60" required autocomplete="name">
+            </label>
+            <label><span>Pet's name <span class="optional">(optional)</span></span>
+              <input type="text" name="pet_name" maxlength="60">
+            </label>
+            <label>Rating
+              <select name="rating" required>
+                <option value="">Choose a rating</option>
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Good</option>
+                <option value="3">3 - Okay</option>
+                <option value="2">2 - Poor</option>
+                <option value="1">1 - Bad</option>
+              </select>
+            </label>
+            <label class="full">Your review
+              <textarea name="review" rows="4" minlength="5" maxlength="1000" required></textarea>
+            </label>
+          </div>
+          <button type="submit" class="btn">Submit review</button>
+          <p class="form-status" id="review-status" role="status"></p>
+        </form>
+        <p class="form-status" id="review-thanks" role="status"></p>
+
+        <div class="review-list" id="review-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

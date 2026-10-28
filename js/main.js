@@ -1,5 +1,5 @@
-// Booking and review forms. They talk to server.py, which saves entries to
-// data/appointments.txt and data/reviews.txt.
+// Booking (book.html) and review (reviews.html) forms. They talk to server.py,
+// which saves entries to data/appointments.txt and data/reviews.txt.
 
 const SERVER_HINT = 'Could not reach the site server. Start it with "python3 server.py" and open http://localhost:8000.';
 const TIMES = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
@@ -48,167 +48,177 @@ function setStatus(element, message, isError) {
   element.classList.toggle('error', Boolean(isError));
 }
 
-/* ---------- Booking ---------- */
+/* ---------- Booking (book.html) ---------- */
 
-const bookingForm = document.getElementById('booking-form');
-const bookingStatus = document.getElementById('booking-status');
-const confirmation = document.getElementById('booking-confirmation');
-const dateInput = bookingForm.elements.date;
-const timeSelect = bookingForm.elements.time;
-const serviceSelect = bookingForm.elements.service;
-const petTypeSelect = bookingForm.elements.pet_type;
+function initBooking(bookingForm) {
+  const bookingStatus = document.getElementById('booking-status');
+  const confirmation = document.getElementById('booking-confirmation');
+  const dateInput = bookingForm.elements.date;
+  const timeSelect = bookingForm.elements.time;
+  const serviceSelect = bookingForm.elements.service;
+  const petTypeSelect = bookingForm.elements.pet_type;
 
-dateInput.min = todayISO();
+  dateInput.min = todayISO();
 
-// "Book dog grooming" etc. pre-select the first service in that group.
-document.querySelectorAll('[data-book]').forEach((button) => {
-  button.addEventListener('click', () => {
-    const group = serviceSelect.querySelector(`optgroup[label="${button.dataset.book}"]`);
-    if (group) serviceSelect.value = group.querySelector('option').value;
-    serviceSelect.dispatchEvent(new Event('change'));
+  // Services that start with "Dog:" or "Cat:" set the pet type to match.
+  serviceSelect.addEventListener('change', () => {
+    const species = serviceSelect.value.split(':')[0];
+    if (species === 'Dog' || species === 'Cat') petTypeSelect.value = species;
   });
-});
 
-// Services that start with "Dog:" or "Cat:" set the pet type to match.
-serviceSelect.addEventListener('change', () => {
-  const species = serviceSelect.value.split(':')[0];
-  if (species === 'Dog' || species === 'Cat') petTypeSelect.value = species;
-});
+  // Links from other pages can pre-fill the form:
+  //   ?group=Dog+grooming picks the first service in that group (services page)
+  //   ?service=...&pet=Dog&notes=... (AI assistant)
+  const params = new URLSearchParams(window.location.search);
+  const group = [...serviceSelect.querySelectorAll('optgroup')].find((g) => g.label === params.get('group'));
+  const service = [...serviceSelect.options].find((option) => option.value && option.value === params.get('service'));
+  if (group) serviceSelect.value = group.querySelector('option').value;
+  if (service) serviceSelect.value = service.value;
+  if (group || service) serviceSelect.dispatchEvent(new Event('change'));
+  if (params.get('pet') === 'Dog' || params.get('pet') === 'Cat') petTypeSelect.value = params.get('pet');
+  if (params.get('notes')) bookingForm.elements.notes.value = params.get('notes').slice(0, 500);
 
-async function loadTimes() {
-  const day = dateInput.value;
-  timeSelect.innerHTML = '';
-  timeSelect.disabled = true;
+  async function loadTimes() {
+    const day = dateInput.value;
+    timeSelect.innerHTML = '';
+    timeSelect.disabled = true;
 
-  const placeholder = new Option(day ? 'Loading times...' : 'Pick a date first', '');
-  timeSelect.add(placeholder);
-  if (!day) return;
+    const placeholder = new Option(day ? 'Loading times...' : 'Pick a date first', '');
+    timeSelect.add(placeholder);
+    if (!day) return;
 
-  if (new Date(`${day}T00:00`).getDay() === 0) {
-    placeholder.text = 'Closed on Sundays';
-    return;
-  }
-
-  let booked = [];
-  try {
-    booked = (await api(`/api/appointments?date=${encodeURIComponent(day)}`)).booked;
-  } catch (error) {
-    placeholder.text = 'Times unavailable';
-    setStatus(bookingStatus, error.message, true);
-    return;
-  }
-
-  const now = new Date();
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  let openSlots = 0;
-  placeholder.text = 'Choose a time';
-  TIMES.forEach((time) => {
-    const isBooked = booked.includes(time);
-    const isPast = day === todayISO() && time <= currentTime;
-    const option = new Option(formatTime(time) + (isBooked ? ' (booked)' : ''), time);
-    option.disabled = isBooked || isPast;
-    if (!option.disabled) openSlots += 1;
-    timeSelect.add(option);
-  });
-  if (openSlots === 0) placeholder.text = 'Fully booked, please try another day';
-  timeSelect.disabled = false;
-}
-
-dateInput.addEventListener('change', () => {
-  setStatus(bookingStatus, '');
-  loadTimes();
-});
-
-bookingForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const button = bookingForm.querySelector('button[type="submit"]');
-  button.disabled = true;
-  setStatus(bookingStatus, 'Booking...');
-  try {
-    const booking = await api('/api/appointments', formToObject(bookingForm));
-    document.getElementById('booking-summary').textContent =
-      `${booking.pet_name} is booked for ${booking.service} on ${formatDate(booking.date)} at ${formatTime(booking.time)}.`;
-    document.getElementById('booking-reference').textContent = booking.reference;
-    bookingForm.hidden = true;
-    confirmation.hidden = false;
-    setStatus(bookingStatus, '');
-  } catch (error) {
-    setStatus(bookingStatus, error.message, true);
-    loadTimes();
-  } finally {
-    button.disabled = false;
-  }
-});
-
-document.getElementById('book-another').addEventListener('click', () => {
-  bookingForm.reset();
-  loadTimes();
-  confirmation.hidden = true;
-  bookingForm.hidden = false;
-});
-
-/* ---------- Reviews ---------- */
-
-const reviewForm = document.getElementById('review-form');
-const reviewStatus = document.getElementById('review-status');
-const reviewList = document.getElementById('review-list');
-const reviewThanks = document.getElementById('review-thanks');
-
-function renderReview(review) {
-  const card = document.createElement('article');
-  card.className = 'review';
-
-  const rating = document.createElement('p');
-  rating.className = 'review-rating';
-  rating.textContent = `Rating: ${review.rating}/5`;
-
-  const text = document.createElement('p');
-  text.textContent = review.review;
-
-  const author = document.createElement('p');
-  author.className = 'review-author';
-  author.textContent = review.pet_name ? `${review.name}, with ${review.pet_name}` : review.name;
-
-  card.append(rating, text, author);
-  return card;
-}
-
-async function loadReviews() {
-  try {
-    const { reviews } = await api('/api/reviews');
-    reviewList.replaceChildren(...reviews.map(renderReview));
-    if (!reviews.length) {
-      reviewList.innerHTML = '<p class="muted">No reviews yet. Be the first to share your experience.</p>';
+    if (new Date(`${day}T00:00`).getDay() === 0) {
+      placeholder.text = 'Closed on Sundays';
+      return;
     }
-  } catch (error) {
-    reviewList.replaceChildren();
+
+    let booked = [];
+    try {
+      booked = (await api(`/api/appointments?date=${encodeURIComponent(day)}`)).booked;
+    } catch (error) {
+      placeholder.text = 'Times unavailable';
+      setStatus(bookingStatus, error.message, true);
+      return;
+    }
+
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    let openSlots = 0;
+    placeholder.text = 'Choose a time';
+    TIMES.forEach((time) => {
+      const isBooked = booked.includes(time);
+      const isPast = day === todayISO() && time <= currentTime;
+      const option = new Option(formatTime(time) + (isBooked ? ' (booked)' : ''), time);
+      option.disabled = isBooked || isPast;
+      if (!option.disabled) openSlots += 1;
+      timeSelect.add(option);
+    });
+    if (openSlots === 0) placeholder.text = 'Fully booked, please try another day';
+    timeSelect.disabled = false;
   }
+
+  dateInput.addEventListener('change', () => {
+    setStatus(bookingStatus, '');
+    loadTimes();
+  });
+
+  bookingForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = bookingForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    setStatus(bookingStatus, 'Booking...');
+    try {
+      const booking = await api('/api/appointments', formToObject(bookingForm));
+      document.getElementById('booking-summary').textContent =
+        `${booking.pet_name} is booked for ${booking.service} on ${formatDate(booking.date)} at ${formatTime(booking.time)}.`;
+      document.getElementById('booking-reference').textContent = booking.reference;
+      bookingForm.hidden = true;
+      confirmation.hidden = false;
+      setStatus(bookingStatus, '');
+    } catch (error) {
+      setStatus(bookingStatus, error.message, true);
+      loadTimes();
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  document.getElementById('book-another').addEventListener('click', () => {
+    bookingForm.reset();
+    loadTimes();
+    confirmation.hidden = true;
+    bookingForm.hidden = false;
+  });
 }
 
-document.getElementById('write-review').addEventListener('click', () => {
-  reviewForm.hidden = !reviewForm.hidden;
-  setStatus(reviewStatus, '');
-  reviewThanks.textContent = '';
-  if (!reviewForm.hidden) reviewForm.elements.name.focus();
-});
+/* ---------- Reviews (reviews.html) ---------- */
 
-reviewForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const button = reviewForm.querySelector('button[type="submit"]');
-  button.disabled = true;
-  setStatus(reviewStatus, 'Submitting...');
-  try {
-    await api('/api/reviews', formToObject(reviewForm));
-    reviewForm.reset();
-    reviewForm.hidden = true;
-    setStatus(reviewStatus, '');
-    reviewThanks.textContent = 'Thanks for your review!';
-    await loadReviews();
-  } catch (error) {
-    setStatus(reviewStatus, error.message, true);
-  } finally {
-    button.disabled = false;
+function initReviews(reviewForm) {
+  const reviewStatus = document.getElementById('review-status');
+  const reviewList = document.getElementById('review-list');
+  const reviewThanks = document.getElementById('review-thanks');
+
+  function renderReview(review) {
+    const card = document.createElement('article');
+    card.className = 'review';
+
+    const rating = document.createElement('p');
+    rating.className = 'review-rating';
+    rating.textContent = `Rating: ${review.rating}/5`;
+
+    const text = document.createElement('p');
+    text.textContent = review.review;
+
+    const author = document.createElement('p');
+    author.className = 'review-author';
+    author.textContent = review.pet_name ? `${review.name}, with ${review.pet_name}` : review.name;
+
+    card.append(rating, text, author);
+    return card;
   }
-});
 
-loadReviews();
+  async function loadReviews() {
+    try {
+      const { reviews } = await api('/api/reviews');
+      reviewList.replaceChildren(...reviews.map(renderReview));
+      if (!reviews.length) {
+        reviewList.innerHTML = '<p class="muted">No reviews yet. Be the first to share your experience.</p>';
+      }
+    } catch (error) {
+      reviewList.replaceChildren();
+    }
+  }
+
+  document.getElementById('write-review').addEventListener('click', () => {
+    reviewForm.hidden = !reviewForm.hidden;
+    setStatus(reviewStatus, '');
+    reviewThanks.textContent = '';
+    if (!reviewForm.hidden) reviewForm.elements.name.focus();
+  });
+
+  reviewForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = reviewForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    setStatus(reviewStatus, 'Submitting...');
+    try {
+      await api('/api/reviews', formToObject(reviewForm));
+      reviewForm.reset();
+      reviewForm.hidden = true;
+      setStatus(reviewStatus, '');
+      reviewThanks.textContent = 'Thanks for your review!';
+      await loadReviews();
+    } catch (error) {
+      setStatus(reviewStatus, error.message, true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  loadReviews();
+}
+
+const bookingFormElement = document.getElementById('booking-form');
+if (bookingFormElement) initBooking(bookingFormElement);
+const reviewFormElement = document.getElementById('review-form');
+if (reviewFormElement) initReviews(reviewFormElement);

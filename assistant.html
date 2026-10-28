@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Assistant | Pawsitive Care</title>
+  <meta name="description" content="Pawsitive Care offers gentle, welcoming grooming and vaccinations for dogs and cats, with extra support for new pet owners.">
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <img src="images/logo.svg" alt="" class="logo" width="44" height="44">
+        <span class="company-name">Pawsitive Care</span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="assistant.html" aria-current="page">AI Assistant</a>
+        <a href="book.html">Book</a>
+        <a href="reviews.html">Reviews</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="assistant">
+      <div class="container">
+        <p class="eyebrow">AI care assistant <span class="beta">Beta</span></p>
+        <h1>Not sure what your pet needs?</h1>
+        <p class="section-sub">Describe your pet's condition in your own words. Our AI assistant will recommend services and estimate the total price.</p>
+
+        <div class="chat">
+          <div class="chat-header">
+            <img src="images/logo.svg" alt="" width="32" height="32">
+            <div>
+              <strong>Pawsitive AI</strong>
+              <span class="chat-online">Online</span>
+            </div>
+          </div>
+          <div class="chat-log" id="chat-log" aria-live="polite">
+            <div class="msg bot">
+              <p>Hi! I'm Pawsitive AI. Tell me about your dog or cat: their breed or size, and anything going on with their coat, skin, nails, ears, teeth or vaccines. I'll recommend the right services and estimate the price.</p>
+            </div>
+          </div>
+          <div class="chips" id="chips">
+            <button type="button" class="chip">My 70 lb golden retriever is matted behind the ears and his nails click on the floor</button>
+            <button type="button" class="chip">My cat sheds everywhere, gets nervous at the vet and has bad breath</button>
+            <button type="button" class="chip">I just adopted my first puppy. She's 4 months old, a bit smelly and needs her shots</button>
+          </div>
+          <form class="chat-form" id="assistant-form">
+            <label for="assistant-input" class="visually-hidden">Describe your pet</label>
+            <textarea id="assistant-input" rows="2" maxlength="1000" required
+              placeholder="e.g. My shih tzu's hair is overgrown, she smells and needs her rabies shot"></textarea>
+            <button type="submit" class="btn">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/assistant.js"></script>
+</body>
+</html>

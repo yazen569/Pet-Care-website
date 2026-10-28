@@ -23,10 +23,13 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_DATA_DIR = os.path.join(ROOT, "data")
 
 # Only these are served to the browser; data/, server.py and .git stay private.
-PUBLIC_FILES = {"index.html"}
+PUBLIC_FILES = {
+    "index.html", "about.html", "services.html", "assistant.html",
+    "book.html", "reviews.html", "contact.html",
+}
 PUBLIC_DIRS = ("css/", "js/", "images/")
 
-# Must match the <option> values in the booking form in index.html.
+# Must match the <option> values in the booking form in book.html.
 SERVICES = (
     "Free meet-and-greet",
     "Dog: Bath & brush (small, under 25 lb)",

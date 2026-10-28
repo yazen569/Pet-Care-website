@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book an appointment | Pawsitive Care</title>
+  <meta name="description" content="Pawsitive Care offers gentle, welcoming grooming and vaccinations for dogs and cats, with extra support for new pet owners.">
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <img src="images/logo.svg" alt="" class="logo" width="44" height="44">
+        <span class="company-name">Pawsitive Care</span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="assistant.html">AI Assistant</a>
+        <a href="book.html" aria-current="page">Book</a>
+        <a href="reviews.html">Reviews</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="booking" id="booking">
+      <div class="container">
+        <p class="eyebrow">Book an appointment</p>
+        <h1>Pick a time that works for you</h1>
+        <p class="section-sub">Open Monday to Saturday, 9:00 AM to 5:00 PM. New to all this? Choose the free meet-and-greet and we'll take it from there.</p>
+
+        <form id="booking-form" class="form-card">
+          <div class="form-grid">
+            <label>Your name
+              <input type="text" name="owner_name" maxlength="80" required autocomplete="name">
+            </label>
+            <label>Email
+              <input type="email" name="email" maxlength="120" required autocomplete="email">
+            </label>
+            <label><span>Phone <span class="optional">(optional)</span></span>
+              <input type="tel" name="phone" maxlength="30" autocomplete="tel">
+            </label>
+            <label>Pet's name
+              <input type="text" name="pet_name" maxlength="60" required>
+            </label>
+            <label>Pet type
+              <select name="pet_type" required>
+                <option value="">Choose one</option>
+                <option>Dog</option>
+                <option>Cat</option>
+              </select>
+            </label>
+            <label>Service
+              <select name="service" required>
+                <option value="">Choose a service</option>
+                <optgroup label="Getting started">
+                  <option>Free meet-and-greet</option>
+                </optgroup>
+                <optgroup label="Dog grooming">
+                  <option>Dog: Bath &amp; brush (small, under 25 lb)</option>
+                  <option>Dog: Bath &amp; brush (medium, 25–60 lb)</option>
+                  <option>Dog: Bath &amp; brush (large, 60 lb+)</option>
+                  <option>Dog: Full groom</option>
+                  <option>Dog: Puppy's first groom</option>
+                </optgroup>
+                <optgroup label="Cat grooming">
+                  <option>Cat: Bath &amp; brush</option>
+                  <option>Cat: Lion cut</option>
+                  <option>Cat: De-shedding treatment</option>
+                  <option>Cat: Sanitary trim</option>
+                </optgroup>
+                <optgroup label="Vaccinations">
+                  <option>Dog: Vaccination</option>
+                  <option>Cat: Vaccination</option>
+                </optgroup>
+                <optgroup label="Add-ons">
+                  <option>Add-on only (nail trim, ears, teeth, de-matting or flea bath)</option>
+                </optgroup>
+              </select>
+            </label>
+            <label>Date
+              <input type="date" name="date" required>
+            </label>
+            <label>Time
+              <select name="time" required disabled>
+                <option value="">Pick a date first</option>
+              </select>
+            </label>
+            <label class="full"><span>Anything we should know? <span class="optional">(optional)</span></span>
+              <textarea name="notes" rows="3" maxlength="500" placeholder="Health issues, nervousness, special requests..."></textarea>
+            </label>
+            <label class="full checkbox">
+              <input type="checkbox" name="first_time_owner">
+              This is my first pet, and I'd like some extra guidance
+            </label>
+          </div>
+          <button type="submit" class="btn">Book appointment</button>
+          <p class="form-status" id="booking-status" role="status"></p>
+        </form>
+
+        <div class="confirmation" id="booking-confirmation" hidden>
+          <h3>You're booked!</h3>
+          <p id="booking-summary"></p>
+          <p>Your reference number is <strong id="booking-reference"></strong>. Please keep it handy in case you need to change your appointment.</p>
+          <button type="button" class="btn btn-ghost" id="book-another">Book another appointment</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -115,7 +115,9 @@ class ServerTest(unittest.TestCase):
                 self.assertEqual(self.request("/api/reviews", data)[0], 400)
 
     def test_site_files_are_served_but_private_files_are_not(self):
-        for path in ("/", "/index.html", "/css/styles.css", "/js/main.js", "/images/logo.svg"):
+        pages = ("/", "/index.html", "/about.html", "/services.html", "/assistant.html",
+                 "/book.html", "/reviews.html", "/contact.html")
+        for path in pages + ("/css/styles.css", "/js/main.js", "/js/assistant.js", "/images/logo.svg"):
             with self.subTest(path):
                 self.assertEqual(self.request(path)[0], 200)
         for path in ("/data/appointments.txt", "/data/reviews.txt", "/server.py",
@@ -151,8 +153,12 @@ class OptionCollector(HTMLParser):
 
 
 class FormMatchesServerTest(unittest.TestCase):
+    def test_every_page_is_served(self):
+        pages = {f for f in os.listdir(server.ROOT) if f.endswith(".html")}
+        self.assertEqual(pages, server.PUBLIC_FILES)
+
     def test_service_options_match_server_list(self):
-        with open(os.path.join(server.ROOT, "index.html"), encoding="utf-8") as f:
+        with open(os.path.join(server.ROOT, "book.html"), encoding="utf-8") as f:
             parser = OptionCollector()
             parser.feed(f.read())
         self.assertEqual(tuple(o.strip() for o in parser.options), server.SERVICES)
