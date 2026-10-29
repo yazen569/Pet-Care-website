@@ -197,6 +197,27 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--teal); outl
 }
 .confirmation h3 { color: var(--teal-dark); }
 
+/* Service checklist on the booking form */
+.service-picker { border: 1px solid var(--line); border-radius: 4px; padding: 12px 16px 14px; margin: 0; min-width: 0; }
+.service-picker legend { font-weight: 600; font-size: 0.9rem; padding: 0 4px; }
+.service-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; }
+.service-group { padding: 6px 8px; border-radius: 4px; }
+.service-group.highlight { background: #eef6f5; outline: 1px solid var(--teal); }
+.service-group h3 { font-size: 0.9rem; color: var(--teal-dark); margin: 4px 0 6px; }
+.form-grid label.service-option {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  font-weight: 400;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee7dc;
+}
+.service-option input { width: auto; margin-top: 4px; }
+.service-option .service-name { flex: 1; }
+.service-option .price { font-weight: 700; }
+.selection-total { margin: 12px 0 0; font-weight: 700; color: var(--teal-dark); }
+.confirmation .estimate { max-width: 520px; }
+
 /* Reviews */
 .review-list {
   display: grid;
@@ -326,7 +347,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--teal); outl
 
 @media (max-width: 560px) {
   .hero h1 { font-size: 2rem; }
-  .form-grid, .review-list, .contact-grid { grid-template-columns: minmax(0, 1fr); }
+  .form-grid, .review-list, .contact-grid, .service-groups { grid-template-columns: minmax(0, 1fr); }
   .msg { max-width: 100%; }
   .chat-form { flex-direction: column; }
 }

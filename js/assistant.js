@@ -3,35 +3,34 @@
 // This is NOT a real AI model. It looks for keywords in the visitor's
 // description, picks services from the price list below, and animates the
 // reply (typing indicator, word-by-word text) so it feels like a live chat.
-// Prices here must be kept in sync with services.html.
-
-const ADD_ON = 'Add-on only (nail trim, ears, teeth, de-matting or flea bath)';
+// Prices must match SERVICES in server.py; `book` is the service's name there
+// (tests/test_server.py checks both).
 
 const SERVICES = {
   meetGreet: { name: 'Free meet-and-greet', price: 0, book: 'Free meet-and-greet' },
-  dogBathSmall: { name: 'Bath & brush (small dog)', price: 45, book: 'Dog: Bath & brush (small, under 25 lb)' },
-  dogBathMedium: { name: 'Bath & brush (medium dog)', price: 60, book: 'Dog: Bath & brush (medium, 25–60 lb)' },
-  dogBathLarge: { name: 'Bath & brush (large dog)', price: 75, book: 'Dog: Bath & brush (large, 60 lb+)' },
-  dogFullGroom: { name: 'Full groom (bath, haircut, nails, ears)', price: 70, from: true, book: 'Dog: Full groom' },
-  puppyGroom: { name: "Puppy's first groom", price: 35, book: "Dog: Puppy's first groom" },
-  catBath: { name: 'Cat bath & brush', price: 55, book: 'Cat: Bath & brush' },
-  lionCut: { name: 'Lion cut', price: 75, book: 'Cat: Lion cut' },
-  deShed: { name: 'De-shedding treatment', price: 65, book: 'Cat: De-shedding treatment' },
-  sanitary: { name: 'Sanitary trim', price: 30, book: 'Cat: Sanitary trim' },
-  calmCat: { name: 'Calm-cat session (extra time & breaks)', price: 15 },
-  nailTrim: { name: 'Nail trim', price: 15, book: ADD_ON },
-  nailGrind: { name: 'Nail grinding', price: 20, book: ADD_ON },
-  ears: { name: 'Ear cleaning', price: 12, book: ADD_ON },
-  teeth: { name: 'Teeth brushing', price: 12, book: ADD_ON },
-  dematting: { name: 'De-matting (about 30 min)', price: 30, book: ADD_ON },
-  fleaBath: { name: 'Flea & tick bath', price: 20, book: ADD_ON },
-  dogRabies: { name: 'Rabies vaccine', price: 25, book: 'Dog: Vaccination' },
-  dhpp: { name: 'DHPP vaccine (distemper combo)', price: 35, book: 'Dog: Vaccination' },
-  bordetella: { name: 'Bordetella vaccine (kennel cough)', price: 30, book: 'Dog: Vaccination' },
-  lepto: { name: 'Leptospirosis vaccine', price: 30, book: 'Dog: Vaccination' },
-  catRabies: { name: 'Rabies vaccine', price: 25, book: 'Cat: Vaccination' },
-  fvrcp: { name: 'FVRCP vaccine (feline distemper combo)', price: 30, book: 'Cat: Vaccination' },
-  felv: { name: 'FeLV vaccine (feline leukemia)', price: 35, book: 'Cat: Vaccination' },
+  dogBathSmall: { name: 'Bath & brush (small dog)', price: 45, book: 'Dog bath & brush (small, under 25 lb)' },
+  dogBathMedium: { name: 'Bath & brush (medium dog)', price: 60, book: 'Dog bath & brush (medium, 25–60 lb)' },
+  dogBathLarge: { name: 'Bath & brush (large dog)', price: 75, book: 'Dog bath & brush (large, 60 lb+)' },
+  dogFullGroom: { name: 'Full groom (bath, haircut, nails, ears)', price: 70, from: true, book: 'Dog full groom (bath, haircut, nails, ears)' },
+  puppyGroom: { name: "Puppy's first groom", price: 35, book: "Puppy's first groom (under 6 months)" },
+  catBath: { name: 'Cat bath & brush', price: 55, book: 'Cat bath & brush' },
+  lionCut: { name: 'Lion cut', price: 75, book: 'Lion cut' },
+  deShed: { name: 'De-shedding treatment', price: 65, book: 'De-shedding treatment' },
+  sanitary: { name: 'Sanitary trim', price: 30, book: 'Sanitary trim' },
+  calmCat: { name: 'Calm-cat session (extra time & breaks)', price: 15, book: 'Calm-cat session (extra time & breaks)' },
+  nailTrim: { name: 'Nail trim', price: 15, book: 'Nail trim' },
+  nailGrind: { name: 'Nail grinding', price: 20, book: 'Nail grinding' },
+  ears: { name: 'Ear cleaning', price: 12, book: 'Ear cleaning' },
+  teeth: { name: 'Teeth brushing', price: 12, book: 'Teeth brushing' },
+  dematting: { name: 'De-matting (about 30 min)', price: 30, book: 'De-matting (30 min)' },
+  fleaBath: { name: 'Flea & tick bath', price: 20, book: 'Flea & tick bath' },
+  dogRabies: { name: 'Rabies vaccine', price: 25, book: 'Dog rabies vaccine' },
+  dhpp: { name: 'DHPP vaccine (distemper combo)', price: 35, book: 'DHPP vaccine (distemper combo)' },
+  bordetella: { name: 'Bordetella vaccine (kennel cough)', price: 30, book: 'Bordetella vaccine (kennel cough)' },
+  lepto: { name: 'Leptospirosis vaccine', price: 30, book: 'Leptospirosis vaccine' },
+  catRabies: { name: 'Rabies vaccine', price: 25, book: 'Cat rabies vaccine' },
+  fvrcp: { name: 'FVRCP vaccine (feline distemper combo)', price: 30, book: 'FVRCP vaccine (feline distemper combo)' },
+  felv: { name: 'FeLV vaccine (feline leukemia)', price: 35, book: 'FeLV vaccine (feline leukemia)' },
 };
 
 const SMALL_BREEDS = ['chihuahua', 'yorkie', 'yorkshire', 'pomeranian', 'shih tzu', 'maltese', 'dachshund', 'pug',
@@ -88,7 +87,7 @@ function dogSize(text) {
   return null;
 }
 
-// Turns a description into { intro, items, notes, total, hasFrom, bookService }.
+// Turns a description into { intro, items, notes, total, hasFrom }.
 function analyze(text, species) {
   const t = text.toLowerCase();
   const items = [];
@@ -230,9 +229,7 @@ function analyze(text, species) {
   } else {
     intro = `Thanks for telling me about your ${petWords}! I couldn't spot a specific issue, so here's where I'd start:`;
   }
-  const bookItem = items.find((item) => item.book && item.book !== ADD_ON) || items.find((item) => item.book);
-
-  return { intro, items, notes, total, hasFrom, bookService: bookItem && bookItem.book };
+  return { intro, items, notes, total, hasFrom };
 }
 
 function unique(list) { return [...new Set(list)]; }
@@ -349,18 +346,13 @@ async function showRecommendation(result, species) {
     await typeInto(p, note);
   }
 
-  if (result.bookService) {
-    const params = new URLSearchParams({
-      service: result.bookService,
-      pet: species,
-      notes: `AI assistant suggested: ${result.items.map((item) => item.name).join(', ')} (estimate ${result.hasFrom ? 'from ' : ''}${money(result.total)})`.slice(0, 480),
-    });
-    const link = document.createElement('a');
-    link.className = 'btn';
-    link.href = `book.html?${params}`;
-    link.textContent = 'Book these services';
-    message.append(link);
-  }
+  const params = new URLSearchParams({ pet: species });
+  result.items.forEach((item) => params.append('services', item.book));
+  const link = document.createElement('a');
+  link.className = 'btn';
+  link.href = `book.html?${params}`;
+  link.textContent = 'Book these services';
+  message.append(link);
   log.scrollTop = log.scrollHeight;
 }
 

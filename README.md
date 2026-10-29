@@ -27,8 +27,8 @@ You can also open the `.html` files directly in a browser to look around (the AI
 
 ## Features
 
-- **AI care assistant (demo):** visitors describe their pet in their own words and get recommended services with an estimated total, then "Book these services" opens the booking form pre-filled. If the description doesn't say dog or cat, it asks. **This is not a real AI model.** `js/assistant.js` matches keywords against the price list and animates the reply (typing indicator, word-by-word text) so it looks live in a demo. Its prices must be kept in sync with `services.html` by hand.
-- **Booking:** the "Book ..." buttons on the services page open the booking form with the matching service selected. Taken time slots show as "(booked)", Sundays are closed, and each booking gets a reference number like `PC-1A2B3C`.
+- **AI care assistant (demo):** visitors describe their pet in their own words and get recommended services with an estimated total, then "Book these services" opens the booking form pre-filled. If the description doesn't say dog or cat, it asks. **This is not a real AI model.** `js/assistant.js` matches keywords against the price list and animates the reply (typing indicator, word-by-word text) so it looks live in a demo. Prices live in `SERVICES` in `server.py`; the booking checklist and `js/assistant.js` must match it (tests check both), and `services.html` should be updated by hand.
+- **Booking:** pick one or more services from a checklist that shows each price and a running total. Choosing dog or cat hides the other pet's services. The "Book ..." buttons on the services page open the form with that group highlighted, and the AI assistant's "Book these services" ticks everything it recommended. Taken time slots show as "(booked)", Sundays are closed, and the confirmation lists each service with its price, the total and a reference number like `PC-1A2B3C`. The total is worked out by the server from its own price list.
 - **Reviews:** "Write a review" opens a form. Submitted reviews show on the page, newest first.
 - **Logo:** `images/logo.svg`, also used as the browser tab icon.
 
@@ -36,7 +36,7 @@ You can also open the `.html` files directly in a browser to look around (the AI
 
 | File | What's in it |
 |---|---|
-| `data/appointments.txt` | One booking per line |
+| `data/appointments.txt` | One booking per line, with its services (separated by `; `) and total |
 | `data/reviews.txt` | One review per line |
 
 Fields are separated by ` | ` and the first line of each file lists the field names. The server never sends these files to the browser, so visitors can't read other people's bookings.

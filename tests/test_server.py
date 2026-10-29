@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 import tempfile
 import threading
@@ -49,7 +50,8 @@ class ServerTest(unittest.TestCase):
     def booking(self, **overrides):
         data = {
             "owner_name": "Sam Lee", "email": "sam@example.com", "phone": "",
-            "pet_name": "Biscuit", "pet_type": "Dog", "service": "Dog: Full groom",
+            "pet_name": "Biscuit", "pet_type": "Dog",
+            "services": ["Dog bath & brush (large, 60 lb+)", "Nail trim", "Dog rabies vaccine"],
             "date": next_weekday(1), "time": "10:00", "notes": "Nervous | shy\nwith strangers",
             "first_time_owner": True,
         }
@@ -70,9 +72,24 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(len(lines), 2)
         self.assertIn("Sam Lee", lines[1])
         self.assertIn("Nervous / shy with strangers", lines[1])
+        self.assertIn("| Dog bath & brush (large, 60 lb+); Nail trim; Dog rabies vaccine | $115 |", lines[1])
+
+        reply = json.loads(body)
+        self.assertEqual(reply["total"], "$115")
+        self.assertEqual([(s["name"], s["price"]) for s in reply["services"]],
+                         [("Dog bath & brush (large, 60 lb+)", 75), ("Nail trim", 15), ("Dog rabies vaccine", 25)])
 
         status, body = self.request(f"/api/appointments?date={next_weekday(1)}")
         self.assertEqual(json.loads(body), {"booked": ["10:00"]})
+
+    def test_total_uses_server_prices_and_from_prices(self):
+        data = self.booking(services=["Dog full groom (bath, haircut, nails, ears)", "Teeth brushing",
+                                      "Teeth brushing"], price=1)
+        status, body = self.request("/api/appointments", data)
+        self.assertEqual(status, 201)
+        reply = json.loads(body)
+        self.assertEqual(reply["total"], "from $82")
+        self.assertEqual(len(reply["services"]), 2)  # duplicate removed
 
     def test_double_booking_is_rejected(self):
         self.assertEqual(self.request("/api/appointments", self.booking())[0], 201)
@@ -86,7 +103,9 @@ class ServerTest(unittest.TestCase):
             "sunday": self.booking(date=next_weekday(6)),
             "bad time": self.booking(time="08:00"),
             "bad email": self.booking(email="nope"),
-            "unknown service": self.booking(service="Haircut"),
+            "no services": self.booking(services=[]),
+            "services not a list": self.booking(services="Nail trim"),
+            "unknown service": self.booking(services=["Nail trim", "Haircut"]),
             "dog service for cat": self.booking(pet_type="Cat"),
             "missing name": self.booking(owner_name="  "),
         }
@@ -126,30 +145,17 @@ class ServerTest(unittest.TestCase):
                 self.assertEqual(self.request(path)[0], 404)
 
 
-class OptionCollector(HTMLParser):
+class CheckboxCollector(HTMLParser):
+    """Collects (value, data-price, has data-from) for the service checkboxes."""
+
     def __init__(self):
         super().__init__()
-        self.in_service_select = False
-        self.in_option = False
-        self.options = []
+        self.services = []
 
     def handle_starttag(self, tag, attrs):
-        if tag == "select" and dict(attrs).get("name") == "service":
-            self.in_service_select = True
-        elif tag == "option" and self.in_service_select:
-            self.in_option = "value" not in dict(attrs)
-            if self.in_option:
-                self.options.append("")
-
-    def handle_endtag(self, tag):
-        if tag == "select":
-            self.in_service_select = False
-        elif tag == "option":
-            self.in_option = False
-
-    def handle_data(self, data):
-        if self.in_option:
-            self.options[-1] += data
+        attrs = dict(attrs)
+        if tag == "input" and attrs.get("name") == "services":
+            self.services.append((attrs["value"], int(attrs["data-price"]), "data-from" in attrs))
 
 
 class FormMatchesServerTest(unittest.TestCase):
@@ -157,11 +163,23 @@ class FormMatchesServerTest(unittest.TestCase):
         pages = {f for f in os.listdir(server.ROOT) if f.endswith(".html")}
         self.assertEqual(pages, server.PUBLIC_FILES)
 
-    def test_service_options_match_server_list(self):
+    def test_booking_checklist_matches_server_prices(self):
         with open(os.path.join(server.ROOT, "book.html"), encoding="utf-8") as f:
-            parser = OptionCollector()
+            parser = CheckboxCollector()
             parser.feed(f.read())
-        self.assertEqual(tuple(o.strip() for o in parser.options), server.SERVICES)
+        expected = [(name, s.price, s.from_price) for name, s in server.SERVICES.items()]
+        self.assertEqual(sorted(parser.services), sorted(expected))
+
+    def test_assistant_prices_match_server(self):
+        with open(os.path.join(server.ROOT, "js", "assistant.js"), encoding="utf-8") as f:
+            source = f.read()
+        entries = re.findall(r"price: (\d+)(, from: true)?, book: (['\"])(.*?)\3", source)
+        self.assertGreater(len(entries), 20)
+        for price, from_price, _, book in entries:
+            with self.subTest(book):
+                self.assertIn(book, server.SERVICES)
+                self.assertEqual(int(price), server.SERVICES[book].price)
+                self.assertEqual(bool(from_price), server.SERVICES[book].from_price)
 
 
 if __name__ == "__main__":

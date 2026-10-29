@@ -20,10 +20,19 @@ async function api(url, data) {
   return body;
 }
 
+// Checkbox groups that share a name (with values) become arrays; single checkboxes become true/false.
 function formToObject(form) {
-  const data = Object.fromEntries(new FormData(form));
-  form.querySelectorAll('input[type="checkbox"]').forEach((box) => { data[box.name] = box.checked; });
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData);
+  form.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+    data[box.name] = box.hasAttribute('value') ? formData.getAll(box.name) : box.checked;
+  });
   return data;
+}
+
+function formatPrice(price, fromPrice) {
+  if (price === 0 && !fromPrice) return 'Free';
+  return `${fromPrice ? 'from ' : ''}$${price}`;
 }
 
 function todayISO() {
@@ -55,28 +64,82 @@ function initBooking(bookingForm) {
   const confirmation = document.getElementById('booking-confirmation');
   const dateInput = bookingForm.elements.date;
   const timeSelect = bookingForm.elements.time;
-  const serviceSelect = bookingForm.elements.service;
   const petTypeSelect = bookingForm.elements.pet_type;
+  const picker = document.getElementById('service-picker');
+  const groups = [...picker.querySelectorAll('.service-group')];
+  const serviceBoxes = [...picker.querySelectorAll('input[name="services"]')];
+  const selectionTotal = document.getElementById('selection-total');
 
   dateInput.min = todayISO();
 
-  // Services that start with "Dog:" or "Cat:" set the pet type to match.
-  serviceSelect.addEventListener('change', () => {
-    const species = serviceSelect.value.split(':')[0];
-    if (species === 'Dog' || species === 'Cat') petTypeSelect.value = species;
-  });
+  function checkedServices() {
+    return serviceBoxes.filter((box) => box.checked);
+  }
+
+  function updateTotal() {
+    const chosen = checkedServices();
+    if (!chosen.length) {
+      selectionTotal.textContent = 'No services selected yet';
+      return;
+    }
+    const total = chosen.reduce((sum, box) => sum + Number(box.dataset.price), 0);
+    const fromPrice = chosen.some((box) => box.hasAttribute('data-from'));
+    const count = `${chosen.length} service${chosen.length === 1 ? '' : 's'} selected`;
+    selectionTotal.textContent = `${count}. Estimated total: ${formatPrice(total, fromPrice)}`;
+  }
+
+  // Once a pet type is chosen, hide (and untick) services for the other pet.
+  function filterByPet() {
+    const pet = petTypeSelect.value;
+    groups.forEach((group) => {
+      const hide = Boolean(pet && group.dataset.pet && group.dataset.pet !== pet);
+      group.hidden = hide;
+      if (hide) group.querySelectorAll('input').forEach((box) => { box.checked = false; });
+    });
+    updateTotal();
+  }
+
+  petTypeSelect.addEventListener('change', filterByPet);
+  serviceBoxes.forEach((box) => box.addEventListener('change', () => {
+    // Ticking a dog-only or cat-only service sets the pet type to match.
+    const pet = box.closest('.service-group').dataset.pet;
+    if (box.checked && pet && !petTypeSelect.value) {
+      petTypeSelect.value = pet;
+      filterByPet();
+    }
+    updateTotal();
+  }));
 
   // Links from other pages can pre-fill the form:
-  //   ?group=Dog+grooming picks the first service in that group (services page)
-  //   ?service=...&pet=Dog&notes=... (AI assistant)
+  //   ?group=Dog+grooming highlights that group (services page)
+  //   ?pet=Dog&services=...&services=... ticks those services (AI assistant)
   const params = new URLSearchParams(window.location.search);
-  const group = [...serviceSelect.querySelectorAll('optgroup')].find((g) => g.label === params.get('group'));
-  const service = [...serviceSelect.options].find((option) => option.value && option.value === params.get('service'));
-  if (group) serviceSelect.value = group.querySelector('option').value;
-  if (service) serviceSelect.value = service.value;
-  if (group || service) serviceSelect.dispatchEvent(new Event('change'));
-  if (params.get('pet') === 'Dog' || params.get('pet') === 'Cat') petTypeSelect.value = params.get('pet');
-  if (params.get('notes')) bookingForm.elements.notes.value = params.get('notes').slice(0, 500);
+  const groupPets = { 'Dog grooming': 'Dog', 'Cat grooming': 'Cat' };
+  const pet = params.get('pet') || groupPets[params.get('group')];
+  if (pet === 'Dog' || pet === 'Cat') petTypeSelect.value = pet;
+  filterByPet();
+  groups.filter((group) => !group.hidden && group.dataset.group && group.dataset.group === params.get('group'))
+    .forEach((group) => group.classList.add('highlight'));
+  const wanted = params.getAll('services');
+  serviceBoxes.forEach((box) => { if (wanted.includes(box.value) && !box.closest('.service-group').hidden) box.checked = true; });
+  updateTotal();
+
+  function showConfirmation(booking) {
+    const services = booking.services.map((item) => item.name);
+    document.getElementById('booking-summary').textContent =
+      `${booking.pet_name} is booked on ${formatDate(booking.date)} at ${formatTime(booking.time)} for ${services.length} service${services.length === 1 ? '' : 's'}:`;
+    const tbody = document.querySelector('#booking-items tbody');
+    tbody.replaceChildren();
+    booking.services.forEach((item) => {
+      const row = tbody.insertRow();
+      row.insertCell().textContent = item.name;
+      const price = row.insertCell();
+      price.className = 'amount';
+      price.textContent = formatPrice(item.price, item.from_price);
+    });
+    document.getElementById('booking-total').textContent = booking.total;
+    document.getElementById('booking-reference').textContent = booking.reference;
+  }
 
   async function loadTimes() {
     const day = dateInput.value;
@@ -124,14 +187,16 @@ function initBooking(bookingForm) {
 
   bookingForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!checkedServices().length) {
+      setStatus(bookingStatus, 'Please choose at least one service.', true);
+      picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     const button = bookingForm.querySelector('button[type="submit"]');
     button.disabled = true;
     setStatus(bookingStatus, 'Booking...');
     try {
-      const booking = await api('/api/appointments', formToObject(bookingForm));
-      document.getElementById('booking-summary').textContent =
-        `${booking.pet_name} is booked for ${booking.service} on ${formatDate(booking.date)} at ${formatTime(booking.time)}.`;
-      document.getElementById('booking-reference').textContent = booking.reference;
+      showConfirmation(await api('/api/appointments', formToObject(bookingForm)));
       bookingForm.hidden = true;
       confirmation.hidden = false;
       setStatus(bookingStatus, '');
@@ -145,6 +210,8 @@ function initBooking(bookingForm) {
 
   document.getElementById('book-another').addEventListener('click', () => {
     bookingForm.reset();
+    groups.forEach((group) => group.classList.remove('highlight'));
+    filterByPet();
     loadTimes();
     confirmation.hidden = true;
     bookingForm.hidden = false;

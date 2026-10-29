@@ -15,6 +15,7 @@ import re
 import secrets
 import sys
 import threading
+from collections import namedtuple
 from datetime import date, datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
@@ -29,29 +30,43 @@ PUBLIC_FILES = {
 }
 PUBLIC_DIRS = ("css/", "js/", "images/")
 
-# Must match the <option> values in the booking form in book.html.
-SERVICES = (
-    "Free meet-and-greet",
-    "Dog: Bath & brush (small, under 25 lb)",
-    "Dog: Bath & brush (medium, 25–60 lb)",
-    "Dog: Bath & brush (large, 60 lb+)",
-    "Dog: Full groom",
-    "Dog: Puppy's first groom",
-    "Cat: Bath & brush",
-    "Cat: Lion cut",
-    "Cat: De-shedding treatment",
-    "Cat: Sanitary trim",
-    "Dog: Vaccination",
-    "Cat: Vaccination",
-    "Add-on only (nail trim, ears, teeth, de-matting or flea bath)",
-)
+# Name -> Service(price in dollars, pet type it's only for or None, True for a "from" price).
+# Must match the checkboxes in the booking form in book.html (a test checks this).
+Service = namedtuple("Service", "price pet from_price")
+SERVICES = {
+    "Free meet-and-greet": Service(0, None, False),
+    "Dog bath & brush (small, under 25 lb)": Service(45, "Dog", False),
+    "Dog bath & brush (medium, 25–60 lb)": Service(60, "Dog", False),
+    "Dog bath & brush (large, 60 lb+)": Service(75, "Dog", False),
+    "Dog full groom (bath, haircut, nails, ears)": Service(70, "Dog", True),
+    "Puppy's first groom (under 6 months)": Service(35, "Dog", False),
+    "Cat bath & brush": Service(55, "Cat", False),
+    "Lion cut": Service(75, "Cat", False),
+    "De-shedding treatment": Service(65, "Cat", False),
+    "Sanitary trim": Service(30, "Cat", False),
+    "Calm-cat session (extra time & breaks)": Service(15, "Cat", False),
+    "Dog rabies vaccine": Service(25, "Dog", False),
+    "DHPP vaccine (distemper combo)": Service(35, "Dog", False),
+    "Bordetella vaccine (kennel cough)": Service(30, "Dog", False),
+    "Leptospirosis vaccine": Service(30, "Dog", False),
+    "Cat rabies vaccine": Service(25, "Cat", False),
+    "FVRCP vaccine (feline distemper combo)": Service(30, "Cat", False),
+    "FeLV vaccine (feline leukemia)": Service(35, "Cat", False),
+    "Nail trim": Service(15, None, False),
+    "Nail grinding": Service(20, None, False),
+    "Ear cleaning": Service(12, None, False),
+    "Teeth brushing": Service(12, None, False),
+    "De-matting (15 min)": Service(15, None, False),
+    "De-matting (30 min)": Service(30, None, False),
+    "Flea & tick bath": Service(20, None, False),
+}
 PET_TYPES = ("Dog", "Cat")
 TIMES = tuple(f"{hour:02d}:00" for hour in range(9, 17))  # last slot 4:00 PM
 SUNDAY = 6
 MAX_BODY_BYTES = 10_000
 
 APPOINTMENT_FIELDS = (
-    "created", "reference", "date", "time", "service", "pet_name", "pet_type",
+    "created", "reference", "date", "time", "services", "total", "pet_name", "pet_type",
     "owner_name", "email", "phone", "first_time_owner", "notes",
 )
 REVIEW_FIELDS = ("created", "name", "pet_name", "rating", "review")
@@ -68,12 +83,6 @@ def clean(value, max_len):
     """Collapse to one line, drop the '|' field separator and trim to max_len."""
     text = " ".join(str(value or "").split()).replace("|", "/")
     return text[:max_len].strip()
-
-
-def species_for(service):
-    """'Dog' or 'Cat' if the service is only for that pet, else None."""
-    prefix = service.split(":", 1)[0]
-    return prefix if prefix in PET_TYPES else None
 
 
 def read_records(path, fields):
@@ -100,13 +109,34 @@ def append_record(path, fields, record):
         f.write(" | ".join(record[field] for field in fields) + "\n")
 
 
+def format_total(services):
+    total = sum(SERVICES[name].price for name in services)
+    prefix = "from " if any(SERVICES[name].from_price for name in services) else ""
+    return f"{prefix}${total}"
+
+
+def clean_services(value, pet_type):
+    """Validate the list of chosen service names; returns them without duplicates."""
+    if not isinstance(value, list):
+        value = []
+    services = list(dict.fromkeys(clean(name, 100) for name in value))
+    if not services:
+        raise ValidationError("Please choose at least one service.")
+    if len(services) > len(SERVICES) or any(name not in SERVICES for name in services):
+        raise ValidationError("Please choose services from the list.")
+    for name in services:
+        pet = SERVICES[name].pet
+        if pet and pet != pet_type:
+            raise ValidationError(f"{name} is only for {pet.lower()}s. Please remove it or change the pet type.")
+    return services
+
+
 def build_appointment(data, existing, now):
     owner_name = clean(data.get("owner_name"), 80)
     email = clean(data.get("email"), 120)
     phone = clean(data.get("phone"), 30)
     pet_name = clean(data.get("pet_name"), 60)
     pet_type = clean(data.get("pet_type"), 10)
-    service = clean(data.get("service"), 100)
     time = clean(data.get("time"), 5)
     notes = clean(data.get("notes"), 500)
 
@@ -118,11 +148,7 @@ def build_appointment(data, existing, now):
         raise ValidationError("Please enter your pet's name.")
     if pet_type not in PET_TYPES:
         raise ValidationError("Please choose dog or cat.")
-    if service not in SERVICES:
-        raise ValidationError("Please choose a service.")
-    species = species_for(service)
-    if species and species != pet_type:
-        raise ValidationError(f"That service is for {species.lower()}s. Please pick a {pet_type.lower()} service.")
+    services = clean_services(data.get("services"), pet_type)
     try:
         day = date.fromisoformat(clean(data.get("date"), 10))
     except ValueError:
@@ -143,7 +169,8 @@ def build_appointment(data, existing, now):
         "reference": "PC-" + secrets.token_hex(3).upper(),
         "date": day.isoformat(),
         "time": time,
-        "service": service,
+        "services": "; ".join(services),
+        "total": format_total(services),
         "pet_name": pet_name,
         "pet_type": pet_type,
         "owner_name": owner_name,
@@ -261,7 +288,11 @@ class Handler(SimpleHTTPRequestHandler):
                     existing = read_records(self.appointments_path, APPOINTMENT_FIELDS)
                     record = build_appointment(data, existing, now)
                     append_record(self.appointments_path, APPOINTMENT_FIELDS, record)
-                    reply = {k: record[k] for k in ("reference", "date", "time", "service", "pet_name", "email")}
+                    reply = {k: record[k] for k in ("reference", "date", "time", "total", "pet_name", "email")}
+                    reply["services"] = [
+                        {"name": name, "price": SERVICES[name].price, "from_price": SERVICES[name].from_price}
+                        for name in record["services"].split("; ")
+                    ]
                 else:
                     record = build_review(data, now)
                     append_record(self.reviews_path, REVIEW_FIELDS, record)

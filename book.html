@@ -55,34 +55,55 @@
                 <option>Cat</option>
               </select>
             </label>
-            <label>Service
-              <select name="service" required>
-                <option value="">Choose a service</option>
-                <optgroup label="Getting started">
-                  <option>Free meet-and-greet</option>
-                </optgroup>
-                <optgroup label="Dog grooming">
-                  <option>Dog: Bath &amp; brush (small, under 25 lb)</option>
-                  <option>Dog: Bath &amp; brush (medium, 25–60 lb)</option>
-                  <option>Dog: Bath &amp; brush (large, 60 lb+)</option>
-                  <option>Dog: Full groom</option>
-                  <option>Dog: Puppy's first groom</option>
-                </optgroup>
-                <optgroup label="Cat grooming">
-                  <option>Cat: Bath &amp; brush</option>
-                  <option>Cat: Lion cut</option>
-                  <option>Cat: De-shedding treatment</option>
-                  <option>Cat: Sanitary trim</option>
-                </optgroup>
-                <optgroup label="Vaccinations">
-                  <option>Dog: Vaccination</option>
-                  <option>Cat: Vaccination</option>
-                </optgroup>
-                <optgroup label="Add-ons">
-                  <option>Add-on only (nail trim, ears, teeth, de-matting or flea bath)</option>
-                </optgroup>
-              </select>
-            </label>
+            <fieldset class="full service-picker" id="service-picker">
+              <legend>Services <span class="optional">(choose one or more)</span></legend>
+              <div class="service-groups">
+                <div class="service-group" data-pet="" data-group="">
+                  <h3>Getting started</h3>
+                  <label class="service-option"><input type="checkbox" name="services" value="Free meet-and-greet" data-price="0"><span class="service-name">Free meet-and-greet</span><span class="price">Free</span></label>
+                </div>
+                <div class="service-group" data-pet="Dog" data-group="Dog grooming">
+                  <h3>Dog grooming</h3>
+                  <label class="service-option"><input type="checkbox" name="services" value="Dog bath &amp; brush (small, under 25 lb)" data-price="45"><span class="service-name">Dog bath &amp; brush (small, under 25 lb)</span><span class="price">$45</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Dog bath &amp; brush (medium, 25–60 lb)" data-price="60"><span class="service-name">Dog bath &amp; brush (medium, 25–60 lb)</span><span class="price">$60</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Dog bath &amp; brush (large, 60 lb+)" data-price="75"><span class="service-name">Dog bath &amp; brush (large, 60 lb+)</span><span class="price">$75</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Dog full groom (bath, haircut, nails, ears)" data-price="70" data-from><span class="service-name">Dog full groom (bath, haircut, nails, ears)</span><span class="price">from $70</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Puppy&#x27;s first groom (under 6 months)" data-price="35"><span class="service-name">Puppy&#x27;s first groom (under 6 months)</span><span class="price">$35</span></label>
+                </div>
+                <div class="service-group" data-pet="Cat" data-group="Cat grooming">
+                  <h3>Cat grooming</h3>
+                  <label class="service-option"><input type="checkbox" name="services" value="Cat bath &amp; brush" data-price="55"><span class="service-name">Cat bath &amp; brush</span><span class="price">$55</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Lion cut" data-price="75"><span class="service-name">Lion cut</span><span class="price">$75</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="De-shedding treatment" data-price="65"><span class="service-name">De-shedding treatment</span><span class="price">$65</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Sanitary trim" data-price="30"><span class="service-name">Sanitary trim</span><span class="price">$30</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Calm-cat session (extra time &amp; breaks)" data-price="15"><span class="service-name">Calm-cat session (extra time &amp; breaks)</span><span class="price">$15</span></label>
+                </div>
+                <div class="service-group" data-pet="Dog" data-group="Vaccinations">
+                  <h3>Dog vaccinations</h3>
+                  <label class="service-option"><input type="checkbox" name="services" value="Dog rabies vaccine" data-price="25"><span class="service-name">Dog rabies vaccine</span><span class="price">$25</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="DHPP vaccine (distemper combo)" data-price="35"><span class="service-name">DHPP vaccine (distemper combo)</span><span class="price">$35</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Bordetella vaccine (kennel cough)" data-price="30"><span class="service-name">Bordetella vaccine (kennel cough)</span><span class="price">$30</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Leptospirosis vaccine" data-price="30"><span class="service-name">Leptospirosis vaccine</span><span class="price">$30</span></label>
+                </div>
+                <div class="service-group" data-pet="Cat" data-group="Vaccinations">
+                  <h3>Cat vaccinations</h3>
+                  <label class="service-option"><input type="checkbox" name="services" value="Cat rabies vaccine" data-price="25"><span class="service-name">Cat rabies vaccine</span><span class="price">$25</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="FVRCP vaccine (feline distemper combo)" data-price="30"><span class="service-name">FVRCP vaccine (feline distemper combo)</span><span class="price">$30</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="FeLV vaccine (feline leukemia)" data-price="35"><span class="service-name">FeLV vaccine (feline leukemia)</span><span class="price">$35</span></label>
+                </div>
+                <div class="service-group" data-pet="" data-group="Add-ons">
+                  <h3>Add-ons (dogs and cats)</h3>
+                  <label class="service-option"><input type="checkbox" name="services" value="Nail trim" data-price="15"><span class="service-name">Nail trim</span><span class="price">$15</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Nail grinding" data-price="20"><span class="service-name">Nail grinding</span><span class="price">$20</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Ear cleaning" data-price="12"><span class="service-name">Ear cleaning</span><span class="price">$12</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Teeth brushing" data-price="12"><span class="service-name">Teeth brushing</span><span class="price">$12</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="De-matting (15 min)" data-price="15"><span class="service-name">De-matting (15 min)</span><span class="price">$15</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="De-matting (30 min)" data-price="30"><span class="service-name">De-matting (30 min)</span><span class="price">$30</span></label>
+                  <label class="service-option"><input type="checkbox" name="services" value="Flea &amp; tick bath" data-price="20"><span class="service-name">Flea &amp; tick bath</span><span class="price">$20</span></label>
+                </div>
+              </div>
+              <p class="selection-total" id="selection-total" aria-live="polite">No services selected yet</p>
+            </fieldset>
             <label>Date
               <input type="date" name="date" required>
             </label>
@@ -106,6 +127,10 @@
         <div class="confirmation" id="booking-confirmation" hidden>
           <h3>You're booked!</h3>
           <p id="booking-summary"></p>
+          <table class="estimate" id="booking-items">
+            <tbody></tbody>
+            <tfoot><tr><td>Total</td><td class="amount" id="booking-total"></td></tr></tfoot>
+          </table>
           <p>Your reference number is <strong id="booking-reference"></strong>. Please keep it handy in case you need to change your appointment.</p>
           <button type="button" class="btn btn-ghost" id="book-another">Book another appointment</button>
         </div>
