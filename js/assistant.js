@@ -305,7 +305,7 @@ async function askSpecies(description) {
   log.scrollTop = log.scrollHeight;
 }
 
-async function showRecommendation(result, species) {
+async function showRecommendation(result) {
   await thinking();
   const message = addMessage('bot');
   const intro = document.createElement('p');
@@ -346,7 +346,7 @@ async function showRecommendation(result, species) {
     await typeInto(p, note);
   }
 
-  const params = new URLSearchParams({ pet: species });
+  const params = new URLSearchParams();
   result.items.forEach((item) => params.append('services', item.book));
   const link = document.createElement('a');
   link.className = 'btn';
@@ -371,7 +371,7 @@ async function respond(text, speciesAnswer) {
       return;
     }
     pendingDescription = null;
-    await showRecommendation(analyze(description, species), species);
+    await showRecommendation(analyze(description, species));
   } finally {
     busy = false;
   }

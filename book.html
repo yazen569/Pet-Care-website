@@ -31,7 +31,7 @@
     <section class="booking" id="booking">
       <div class="container">
         <p class="eyebrow">Book an appointment</p>
-        <h1>Pick a time that works for you</h1>
+        <h1>Pick a day that works for you</h1>
         <p class="section-sub">Open Monday to Saturday, 9:00 AM to 5:00 PM. New to all this? Choose the free meet-and-greet and we'll take it from there.</p>
 
         <form id="booking-form" class="form-card">
@@ -42,18 +42,8 @@
             <label>Email
               <input type="email" name="email" maxlength="120" required autocomplete="email">
             </label>
-            <label><span>Phone <span class="optional">(optional)</span></span>
-              <input type="tel" name="phone" maxlength="30" autocomplete="tel">
-            </label>
             <label>Pet's name
               <input type="text" name="pet_name" maxlength="60" required>
-            </label>
-            <label>Pet type
-              <select name="pet_type" required>
-                <option value="">Choose one</option>
-                <option>Dog</option>
-                <option>Cat</option>
-              </select>
             </label>
             <fieldset class="full service-picker" id="service-picker">
               <legend>Services <span class="optional">(choose one or more)</span></legend>
@@ -106,11 +96,6 @@
             </fieldset>
             <label>Date
               <input type="date" name="date" required>
-            </label>
-            <label>Time
-              <select name="time" required disabled>
-                <option value="">Pick a date first</option>
-              </select>
             </label>
             <label class="full"><span>Anything we should know? <span class="optional">(optional)</span></span>
               <textarea name="notes" rows="3" maxlength="500" placeholder="Health issues, nervousness, special requests..."></textarea>

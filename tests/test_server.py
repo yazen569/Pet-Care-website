@@ -49,10 +49,9 @@ class ServerTest(unittest.TestCase):
 
     def booking(self, **overrides):
         data = {
-            "owner_name": "Sam Lee", "email": "sam@example.com", "phone": "",
-            "pet_name": "Biscuit", "pet_type": "Dog",
+            "owner_name": "Sam Lee", "email": "sam@example.com", "pet_name": "Biscuit",
             "services": ["Dog bath & brush (large, 60 lb+)", "Nail trim", "Dog rabies vaccine"],
-            "date": next_weekday(1), "time": "10:00", "notes": "Nervous | shy\nwith strangers",
+            "date": next_weekday(1), "notes": "Nervous | shy\nwith strangers",
             "first_time_owner": True,
         }
         data.update(overrides)
@@ -62,7 +61,7 @@ class ServerTest(unittest.TestCase):
         with open(os.path.join(self.data_dir, name), encoding="utf-8") as f:
             return f.read()
 
-    def test_booking_is_saved_and_slot_shows_as_booked(self):
+    def test_booking_is_saved(self):
         status, body = self.request("/api/appointments", self.booking())
         self.assertEqual(status, 201)
         self.assertTrue(json.loads(body)["reference"].startswith("PC-"))
@@ -79,9 +78,6 @@ class ServerTest(unittest.TestCase):
         self.assertEqual([(s["name"], s["price"]) for s in reply["services"]],
                          [("Dog bath & brush (large, 60 lb+)", 75), ("Nail trim", 15), ("Dog rabies vaccine", 25)])
 
-        status, body = self.request(f"/api/appointments?date={next_weekday(1)}")
-        self.assertEqual(json.loads(body), {"booked": ["10:00"]})
-
     def test_total_uses_server_prices_and_from_prices(self):
         data = self.booking(services=["Dog full groom (bath, haircut, nails, ears)", "Teeth brushing",
                                       "Teeth brushing"], price=1)
@@ -91,22 +87,19 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(reply["total"], "from $82")
         self.assertEqual(len(reply["services"]), 2)  # duplicate removed
 
-    def test_double_booking_is_rejected(self):
+    def test_same_day_bookings_are_allowed(self):
         self.assertEqual(self.request("/api/appointments", self.booking())[0], 201)
-        status, body = self.request("/api/appointments", self.booking(owner_name="Other"))
-        self.assertEqual(status, 400)
-        self.assertIn("already booked", json.loads(body)["error"])
+        self.assertEqual(self.request("/api/appointments", self.booking(owner_name="Other"))[0], 201)
+        self.assertEqual(len(self.read_data("appointments.txt").splitlines()), 3)
 
     def test_invalid_bookings_are_rejected(self):
         cases = {
             "past date": self.booking(date="2020-01-07"),
             "sunday": self.booking(date=next_weekday(6)),
-            "bad time": self.booking(time="08:00"),
             "bad email": self.booking(email="nope"),
             "no services": self.booking(services=[]),
             "services not a list": self.booking(services="Nail trim"),
             "unknown service": self.booking(services=["Nail trim", "Haircut"]),
-            "dog service for cat": self.booking(pet_type="Cat"),
             "missing name": self.booking(owner_name="  "),
         }
         for label, data in cases.items():

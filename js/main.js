@@ -2,7 +2,6 @@
 // which saves entries to data/appointments.txt and data/reviews.txt.
 
 const SERVER_HINT = 'Could not reach the site server. Start it with "python3 server.py" and open http://localhost:8000.';
-const TIMES = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
 
 async function api(url, data) {
   let response, body;
@@ -41,11 +40,6 @@ function todayISO() {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-function formatTime(time) {
-  const hour = Number(time.slice(0, 2));
-  return `${hour % 12 || 12}:00 ${hour < 12 ? 'AM' : 'PM'}`;
-}
-
 function formatDate(iso) {
   return new Date(`${iso}T00:00`).toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
@@ -63,8 +57,6 @@ function initBooking(bookingForm) {
   const bookingStatus = document.getElementById('booking-status');
   const confirmation = document.getElementById('booking-confirmation');
   const dateInput = bookingForm.elements.date;
-  const timeSelect = bookingForm.elements.time;
-  const petTypeSelect = bookingForm.elements.pet_type;
   const picker = document.getElementById('service-picker');
   const groups = [...picker.querySelectorAll('.service-group')];
   const serviceBoxes = [...picker.querySelectorAll('input[name="services"]')];
@@ -88,46 +80,27 @@ function initBooking(bookingForm) {
     selectionTotal.textContent = `${count}. Estimated total: ${formatPrice(total, fromPrice)}`;
   }
 
-  // Once a pet type is chosen, hide (and untick) services for the other pet.
-  function filterByPet() {
-    const pet = petTypeSelect.value;
-    groups.forEach((group) => {
-      const hide = Boolean(pet && group.dataset.pet && group.dataset.pet !== pet);
-      group.hidden = hide;
-      if (hide) group.querySelectorAll('input').forEach((box) => { box.checked = false; });
-    });
-    updateTotal();
-  }
+  serviceBoxes.forEach((box) => box.addEventListener('change', updateTotal));
 
-  petTypeSelect.addEventListener('change', filterByPet);
-  serviceBoxes.forEach((box) => box.addEventListener('change', () => {
-    // Ticking a dog-only or cat-only service sets the pet type to match.
-    const pet = box.closest('.service-group').dataset.pet;
-    if (box.checked && pet && !petTypeSelect.value) {
-      petTypeSelect.value = pet;
-      filterByPet();
-    }
-    updateTotal();
-  }));
+  dateInput.addEventListener('change', () => {
+    const isSunday = dateInput.value && new Date(`${dateInput.value}T00:00`).getDay() === 0;
+    setStatus(bookingStatus, isSunday ? "We're closed on Sundays. Please pick another day." : '', isSunday);
+  });
 
   // Links from other pages can pre-fill the form:
   //   ?group=Dog+grooming highlights that group (services page)
-  //   ?pet=Dog&services=...&services=... ticks those services (AI assistant)
+  //   ?services=...&services=... ticks those services (AI assistant)
   const params = new URLSearchParams(window.location.search);
-  const groupPets = { 'Dog grooming': 'Dog', 'Cat grooming': 'Cat' };
-  const pet = params.get('pet') || groupPets[params.get('group')];
-  if (pet === 'Dog' || pet === 'Cat') petTypeSelect.value = pet;
-  filterByPet();
-  groups.filter((group) => !group.hidden && group.dataset.group && group.dataset.group === params.get('group'))
+  groups.filter((group) => group.dataset.group && group.dataset.group === params.get('group'))
     .forEach((group) => group.classList.add('highlight'));
   const wanted = params.getAll('services');
-  serviceBoxes.forEach((box) => { if (wanted.includes(box.value) && !box.closest('.service-group').hidden) box.checked = true; });
+  serviceBoxes.forEach((box) => { if (wanted.includes(box.value)) box.checked = true; });
   updateTotal();
 
   function showConfirmation(booking) {
-    const services = booking.services.map((item) => item.name);
+    const count = booking.services.length;
     document.getElementById('booking-summary').textContent =
-      `${booking.pet_name} is booked on ${formatDate(booking.date)} at ${formatTime(booking.time)} for ${services.length} service${services.length === 1 ? '' : 's'}:`;
+      `${booking.pet_name} is booked on ${formatDate(booking.date)} for ${count} service${count === 1 ? '' : 's'}:`;
     const tbody = document.querySelector('#booking-items tbody');
     tbody.replaceChildren();
     booking.services.forEach((item) => {
@@ -140,50 +113,6 @@ function initBooking(bookingForm) {
     document.getElementById('booking-total').textContent = booking.total;
     document.getElementById('booking-reference').textContent = booking.reference;
   }
-
-  async function loadTimes() {
-    const day = dateInput.value;
-    timeSelect.innerHTML = '';
-    timeSelect.disabled = true;
-
-    const placeholder = new Option(day ? 'Loading times...' : 'Pick a date first', '');
-    timeSelect.add(placeholder);
-    if (!day) return;
-
-    if (new Date(`${day}T00:00`).getDay() === 0) {
-      placeholder.text = 'Closed on Sundays';
-      return;
-    }
-
-    let booked = [];
-    try {
-      booked = (await api(`/api/appointments?date=${encodeURIComponent(day)}`)).booked;
-    } catch (error) {
-      placeholder.text = 'Times unavailable';
-      setStatus(bookingStatus, error.message, true);
-      return;
-    }
-
-    const now = new Date();
-    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    let openSlots = 0;
-    placeholder.text = 'Choose a time';
-    TIMES.forEach((time) => {
-      const isBooked = booked.includes(time);
-      const isPast = day === todayISO() && time <= currentTime;
-      const option = new Option(formatTime(time) + (isBooked ? ' (booked)' : ''), time);
-      option.disabled = isBooked || isPast;
-      if (!option.disabled) openSlots += 1;
-      timeSelect.add(option);
-    });
-    if (openSlots === 0) placeholder.text = 'Fully booked, please try another day';
-    timeSelect.disabled = false;
-  }
-
-  dateInput.addEventListener('change', () => {
-    setStatus(bookingStatus, '');
-    loadTimes();
-  });
 
   bookingForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -202,7 +131,6 @@ function initBooking(bookingForm) {
       setStatus(bookingStatus, '');
     } catch (error) {
       setStatus(bookingStatus, error.message, true);
-      loadTimes();
     } finally {
       button.disabled = false;
     }
@@ -211,8 +139,7 @@ function initBooking(bookingForm) {
   document.getElementById('book-another').addEventListener('click', () => {
     bookingForm.reset();
     groups.forEach((group) => group.classList.remove('highlight'));
-    filterByPet();
-    loadTimes();
+    updateTotal();
     confirmation.hidden = true;
     bookingForm.hidden = false;
   });

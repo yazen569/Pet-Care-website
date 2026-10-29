@@ -18,7 +18,7 @@ import threading
 from collections import namedtuple
 from datetime import date, datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import parse_qs, unquote, urlparse
+from urllib.parse import unquote, urlparse
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_DATA_DIR = os.path.join(ROOT, "data")
@@ -30,7 +30,8 @@ PUBLIC_FILES = {
 }
 PUBLIC_DIRS = ("css/", "js/", "images/")
 
-# Name -> Service(price in dollars, pet type it's only for or None, True for a "from" price).
+# Name -> Service(price in dollars, pet it's for or None (used to group the checklist),
+#                 True for a "from" price).
 # Must match the checkboxes in the booking form in book.html (a test checks this).
 Service = namedtuple("Service", "price pet from_price")
 SERVICES = {
@@ -60,14 +61,12 @@ SERVICES = {
     "De-matting (30 min)": Service(30, None, False),
     "Flea & tick bath": Service(20, None, False),
 }
-PET_TYPES = ("Dog", "Cat")
-TIMES = tuple(f"{hour:02d}:00" for hour in range(9, 17))  # last slot 4:00 PM
 SUNDAY = 6
 MAX_BODY_BYTES = 10_000
 
 APPOINTMENT_FIELDS = (
-    "created", "reference", "date", "time", "services", "total", "pet_name", "pet_type",
-    "owner_name", "email", "phone", "first_time_owner", "notes",
+    "created", "reference", "date", "services", "total", "pet_name",
+    "owner_name", "email", "first_time_owner", "notes",
 )
 REVIEW_FIELDS = ("created", "name", "pet_name", "rating", "review")
 
@@ -115,7 +114,7 @@ def format_total(services):
     return f"{prefix}${total}"
 
 
-def clean_services(value, pet_type):
+def clean_services(value):
     """Validate the list of chosen service names; returns them without duplicates."""
     if not isinstance(value, list):
         value = []
@@ -124,20 +123,13 @@ def clean_services(value, pet_type):
         raise ValidationError("Please choose at least one service.")
     if len(services) > len(SERVICES) or any(name not in SERVICES for name in services):
         raise ValidationError("Please choose services from the list.")
-    for name in services:
-        pet = SERVICES[name].pet
-        if pet and pet != pet_type:
-            raise ValidationError(f"{name} is only for {pet.lower()}s. Please remove it or change the pet type.")
     return services
 
 
-def build_appointment(data, existing, now):
+def build_appointment(data, now):
     owner_name = clean(data.get("owner_name"), 80)
     email = clean(data.get("email"), 120)
-    phone = clean(data.get("phone"), 30)
     pet_name = clean(data.get("pet_name"), 60)
-    pet_type = clean(data.get("pet_type"), 10)
-    time = clean(data.get("time"), 5)
     notes = clean(data.get("notes"), 500)
 
     if not owner_name:
@@ -146,9 +138,7 @@ def build_appointment(data, existing, now):
         raise ValidationError("Please enter a valid email address.")
     if not pet_name:
         raise ValidationError("Please enter your pet's name.")
-    if pet_type not in PET_TYPES:
-        raise ValidationError("Please choose dog or cat.")
-    services = clean_services(data.get("services"), pet_type)
+    services = clean_services(data.get("services"))
     try:
         day = date.fromisoformat(clean(data.get("date"), 10))
     except ValueError:
@@ -157,25 +147,16 @@ def build_appointment(data, existing, now):
         raise ValidationError("Please pick a date from today onwards.")
     if day.weekday() == SUNDAY:
         raise ValidationError("We're closed on Sundays. Please pick another day.")
-    if time not in TIMES:
-        raise ValidationError("Please pick an appointment time.")
-    if day == now.date() and time <= now.strftime("%H:%M"):
-        raise ValidationError("That time has already passed. Please pick a later time.")
-    if any(r["date"] == day.isoformat() and r["time"] == time for r in existing):
-        raise ValidationError("Sorry, that time is already booked. Please pick another.")
 
     return {
         "created": now.isoformat(timespec="seconds"),
         "reference": "PC-" + secrets.token_hex(3).upper(),
         "date": day.isoformat(),
-        "time": time,
         "services": "; ".join(services),
         "total": format_total(services),
         "pet_name": pet_name,
-        "pet_type": pet_type,
         "owner_name": owner_name,
         "email": email,
-        "phone": phone,
         "first_time_owner": "yes" if data.get("first_time_owner") is True else "no",
         "notes": notes,
     }
@@ -242,11 +223,6 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urlparse(self.path)
-        if url.path == "/api/appointments":
-            day = parse_qs(url.query).get("date", [""])[0]
-            booked = sorted({r["time"] for r in read_records(self.appointments_path, APPOINTMENT_FIELDS)
-                             if r["date"] == day})
-            return self.send_json(200, {"booked": booked})
         if url.path == "/api/reviews":
             reviews = read_records(self.reviews_path, REVIEW_FIELDS)[::-1][:20]
             return self.send_json(200, {"reviews": reviews})
@@ -285,10 +261,9 @@ class Handler(SimpleHTTPRequestHandler):
             with _write_lock:
                 now = datetime.now()
                 if path == "/api/appointments":
-                    existing = read_records(self.appointments_path, APPOINTMENT_FIELDS)
-                    record = build_appointment(data, existing, now)
+                    record = build_appointment(data, now)
                     append_record(self.appointments_path, APPOINTMENT_FIELDS, record)
-                    reply = {k: record[k] for k in ("reference", "date", "time", "total", "pet_name", "email")}
+                    reply = {k: record[k] for k in ("reference", "date", "total", "pet_name", "email")}
                     reply["services"] = [
                         {"name": name, "price": SERVICES[name].price, "from_price": SERVICES[name].from_price}
                         for name in record["services"].split("; ")
