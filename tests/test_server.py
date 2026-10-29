@@ -115,7 +115,7 @@ class ServerTest(unittest.TestCase):
                 self.assertEqual(self.request("/api/reviews", data)[0], 400)
 
     def test_site_files_are_served_but_private_files_are_not(self):
-        pages = ("/", "/index.html", "/about.html", "/services.html", "/assistant.html",
+        pages = ("/", "/index.html", "/services.html", "/assistant.html",
                  "/book.html", "/reviews.html", "/contact.html")
         for path in pages + ("/css/styles.css", "/js/main.js", "/js/assistant.js", "/images/logo.svg"):
             with self.subTest(path):

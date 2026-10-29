@@ -85,14 +85,13 @@ a { color: inherit; }
 
 /* Home page boxes */
 .teaser { padding: 32px 0; background: var(--white); border-bottom: 1px solid var(--line); }
-.teaser-alt { background: var(--cream); }
 .teaser h2 { font-size: 1.5rem; }
 .teaser p.muted { margin: 0; max-width: 36em; }
 .teaser-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px 32px; flex-wrap: wrap; }
 
 /* Mission */
-.mission { padding: 48px 0; background: var(--white); }
-.mission h1 { font-size: 1.8rem; }
+.mission { padding: 48px 0; background: var(--white); border-bottom: 1px solid var(--line); }
+.mission h2 { font-size: 1.8rem; }
 .mission-statement {
   max-width: 760px;
   margin: 0 0 12px;
@@ -228,14 +227,6 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--teal); outl
 
 /* AI assistant */
 .assistant { padding: 48px 0; }
-.beta {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 0 6px;
-  border: 1px solid var(--coral);
-  border-radius: 4px;
-  font-size: 0.75rem;
-}
 .chat {
   max-width: 760px;
   background: var(--white);
@@ -319,6 +310,12 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--teal); outl
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* Footer (contact info on every page) */
+.site-footer { background: var(--sand); border-top: 1px solid var(--line); padding: 28px 0; }
+.footer-title { font-weight: 700; color: var(--teal-dark); margin: 0 0 12px; }
+.site-footer h2 { font-size: 0.95rem; color: var(--ink); margin-bottom: 4px; }
+.site-footer .contact-grid p { font-size: 0.9rem; }
 
 /* Responsive */
 @media (max-width: 900px) {

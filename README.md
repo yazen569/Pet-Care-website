@@ -18,8 +18,7 @@ You can also open the `.html` files directly in a browser to look around (the AI
 
 | Page | What's on it |
 |---|---|
-| `index.html` | Home: headline, links to booking and prices, AI assistant and new-owner boxes |
-| `about.html` | Mission statement (welcoming new pet owners) |
+| `index.html` | Home: headline, mission statement (welcoming new pet owners) and a link to the AI assistant |
 | `services.html` | Services and prices, with what is and isn't included |
 | `assistant.html` | AI care assistant |
 | `book.html` | Booking form |
@@ -45,7 +44,7 @@ Fields are separated by ` | ` and the first line of each file lists the field na
 ## Structure
 
 ```
-*.html                The seven pages (each has the same header and menu)
+*.html                The six pages (each has the same header, menu and contact footer)
 css/styles.css        Styles
 js/main.js            Booking and review form logic
 js/assistant.js       AI assistant demo (keyword rules + chat animation)
